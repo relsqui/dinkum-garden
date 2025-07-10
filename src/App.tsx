@@ -29,8 +29,8 @@ function emptyGrid() {
   return grid;
 }
 
-function Plot({onClick, plot}: {onClick: PlotClickHandler, plot: Plot}) {
-  return <div className="plot" onClick={(e) => { onClick(e, plot); }}>{plot.icon} </div>
+function Plot({ onClick, plot }: { onClick: PlotClickHandler, plot: Plot }) {
+  return <div className="plot" onClick={(e) => { onClick(e, plot); }}>{plot.icon}</div>
 }
 
 function App() {
@@ -41,15 +41,13 @@ function App() {
     if (plot.i == center) {
       return
     }
-    const newPlot = {...plot}
+    const newPlot = { ...plot }
     if (plot.icon) {
       newPlot.icon = undefined
     } else {
       newPlot.icon = "🌱"
     }
-    const newGrid = [...grid]
-    newGrid[plot.i] = newPlot
-    setGrid(newGrid)
+    setGrid(grid.map((p, i) => i == plot.i ? newPlot : p))
   }
 
   return (
