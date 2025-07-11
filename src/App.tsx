@@ -1,12 +1,22 @@
 import { useState } from 'react'
 import { Field } from './Field'
-import { Log } from './Log'
+import { Log, type LogLine } from './Log'
 
 function App() {
-  const [ logContents, setLogContents ] = useState<string[]>([])
+  const [logContents, setLogContents] = useState<LogLine[]>([])
 
   function appendLog(message: string) {
-    setLogContents([...logContents, message])
+    if (logContents.length == 0) {
+      setLogContents([{ message, count: 1 }])
+    } else {
+      const lastLog = logContents.slice(-1)[0]
+      if (message == lastLog.message) {
+        lastLog.count++
+        setLogContents([...logContents.slice(0, -1), lastLog])
+      } else {
+        setLogContents([...logContents, { message, count: 1 }])
+      }
+    }
   }
 
   return (

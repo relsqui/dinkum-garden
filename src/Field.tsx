@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { FieldPlot } from './Plot'
-import type { Plot } from './Plot'
+import { FieldPlot, type Plot } from './Plot'
 
 function emptyGrid() {
   const grid: Plot[] = [];
@@ -16,7 +15,7 @@ function emptyGrid() {
   return grid;
 }
 
-export function Field({appendLog}: {appendLog: (message: string) => void}) {
+export function Field({ appendLog }: { appendLog: (message: string) => void }) {
   const [grid, setGrid] = useState(emptyGrid)
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {

@@ -1,9 +1,15 @@
-export function Log({ logContents }: { logContents: string[] }) {
+export interface LogLine {
+    message: string
+    count: number
+}
+
+export function Log({ logContents }: { logContents: LogLine[] }) {
     return <div className="log">
         <div>
-            {logContents.map(logLine => (
-                <div className="logLine">
-                    {logLine}
+            {logContents.map((logLine, i) => (
+                <div className="logLine" key={i}>
+                    {logLine.message}
+                    {logLine.count > 1 ? ` (x${logLine.count})` : ''}
                 </div>
             )
             )}
