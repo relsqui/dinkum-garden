@@ -49,9 +49,6 @@ export function Field({ appendLog, clearLog }: { appendLog: (message: string) =>
             plot.y > 0 ? grid[i - 5] : undefined,
             plot.y < 4 ? grid[i + 5] : undefined,
           ].map((neighbor) => {
-            if (neighbor) {
-              console.log(neighbor)
-            }
             if (neighbor && typeof neighbor.icon == "undefined") {
               // TODO: Track child count and then randomize this
               newGrid[neighbor.i].icon = "🎃"

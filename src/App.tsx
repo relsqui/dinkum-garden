@@ -7,7 +7,6 @@ function App() {
 
   function appendLog(message: string) {
     setLogContents(prevLogContents => {
-      console.log(`Appending log: ${message}`)
       if (prevLogContents.length == 0) {
         return [{ message, count: 1 }]
       } else {
