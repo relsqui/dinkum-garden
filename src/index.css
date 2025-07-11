@@ -21,6 +21,11 @@
   background-color: #242424;
 }
 
+div .fieldContainer {
+  display: flex;
+  flex-direction: column;
+}
+
 div .field {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -65,14 +70,16 @@ a:hover {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   padding: 0.6em 1.2em;
+  margin: 1em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  align-self: center;
 }
 button:hover {
   border-color: #646cff;
@@ -91,6 +98,7 @@ button:focus-visible {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: #213547;
+    color: #ffffff;
   }
 }

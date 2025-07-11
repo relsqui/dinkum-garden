@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FieldPlot, type Plot } from './Plot'
 
 function emptyGrid() {
@@ -26,19 +26,58 @@ export function Field({ appendLog }: { appendLog: (message: string) => void }) {
     }
     const newPlot = { ...plot }
     if (plot.icon) {
-      appendLog(`Removing plant at ${String(plot.x)},${String(plot.y)}.`)
-      newPlot.icon = undefined
+      appendLog(`Removing ${plot.icon} at ${String(plot.x)},${String(plot.y)}.`)
+      delete newPlot.icon
     } else {
-      appendLog(`Adding plant at ${String(plot.x)},${String(plot.y)}.`)
       newPlot.icon = "🌱"
+      appendLog(`Adding ${newPlot.icon} at ${String(plot.x)},${String(plot.y)}.`)
     }
     setGrid(grid.map((p, i) => i == plot.i ? newPlot : p))
   }
 
+  function handleIterate(e: React.MouseEvent) {
+    e.stopPropagation()
+    const newGrid = emptyGrid()
+    grid.map((plot, i) => {
+      if (plot.icon) {
+        newGrid[i].icon = plot.icon
+      }
+      if (plot.icon == "🌱") {
+        [
+          plot.x > 0 ? grid[i - 5] : undefined,
+          plot.x < 4 ? grid[i + 5] : undefined,
+          plot.y > 0 ? grid[i - 1] : undefined,
+          plot.y < 4 ? grid[i + 1] : undefined,
+        ].map((neighbor) => {
+          if (neighbor) {
+            console.log(neighbor)
+          }
+          if (neighbor && typeof neighbor.icon == "undefined") {
+            newGrid[neighbor.i].icon = "🎃"
+            newGrid[neighbor.i].stem = plot.i
+          }
+        })
+      }
+    })
+    setGrid(newGrid)
+  }
+
+  function handleClear(e: React.MouseEvent) {
+    e.stopPropagation()
+    setGrid(emptyGrid())
+    appendLog("Cleared the field.")
+  }
+
   return (
     <>
-      <div className="field">
-        {grid.map((plot) => <FieldPlot onClick={handlePlotClick} plot={plot} key={plot.i} />)}
+      <div className="fieldContainer">
+        <div className="field">
+          {grid.map((plot) => <FieldPlot onClick={handlePlotClick} plot={plot} key={plot.i} />)}
+        </div>
+        <div className="buttonBar">
+          <button onClick={handleIterate}>Iterate</button>
+          <button onClick={handleClear}>Clear</button>
+        </div>
       </div>
     </>
   )
