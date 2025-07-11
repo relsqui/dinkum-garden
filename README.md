@@ -1,3 +1,5 @@
-# Dinkum garden experiment
+# WIP Dinkum squash garden experiment
 
-aka yet another brushing-the-rust-off-my-react project
+Simulating pumpkins for fun and profit.
+
+`npm run dev` to start.

@@ -4,18 +4,17 @@ import { FieldPlot, type Plot } from './Plot'
 function emptyGrid() {
   const grid: Plot[] = [];
   let i = 0;
-  for (let x = 0; x < 5; x++) {
-    for (let y = 0; y < 5; y++) {
+  for (let y = 0; y < 5; y++) {
+    for (let x = 0; x < 5; x++) {
       grid.push({ x, y, i })
       i = i + 1
     }
   }
-  // Center
   grid[12].icon = "💧"
   return grid;
 }
 
-export function Field({ appendLog }: { appendLog: (message: string) => void }) {
+export function Field({ appendLog, clearLog }: { appendLog: (message: string) => void, clearLog: () => void }) {
   const [grid, setGrid] = useState(emptyGrid)
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
@@ -28,6 +27,7 @@ export function Field({ appendLog }: { appendLog: (message: string) => void }) {
     if (plot.icon) {
       appendLog(`Removing ${plot.icon} at ${String(plot.x)},${String(plot.y)}.`)
       delete newPlot.icon
+      delete newPlot.stem
     } else {
       newPlot.icon = "🌱"
       appendLog(`Adding ${newPlot.icon} at ${String(plot.x)},${String(plot.y)}.`)
@@ -37,26 +37,29 @@ export function Field({ appendLog }: { appendLog: (message: string) => void }) {
 
   function handleIterate(e: React.MouseEvent) {
     e.stopPropagation()
+    appendLog("Iterating ...")
     const newGrid = emptyGrid()
     grid.map((plot, i) => {
       if (plot.icon) {
-        newGrid[i].icon = plot.icon
-      }
-      if (plot.icon == "🌱") {
-        [
-          plot.x > 0 ? grid[i - 5] : undefined,
-          plot.x < 4 ? grid[i + 5] : undefined,
-          plot.y > 0 ? grid[i - 1] : undefined,
-          plot.y < 4 ? grid[i + 1] : undefined,
-        ].map((neighbor) => {
-          if (neighbor) {
-            console.log(neighbor)
-          }
-          if (neighbor && typeof neighbor.icon == "undefined") {
-            newGrid[neighbor.i].icon = "🎃"
-            newGrid[neighbor.i].stem = plot.i
-          }
-        })
+        newGrid[i] = { ...plot }
+        if (plot.icon == "🌱") {
+          [
+            plot.x > 0 ? grid[i - 1] : undefined,
+            plot.x < 4 ? grid[i + 1] : undefined,
+            plot.y > 0 ? grid[i - 5] : undefined,
+            plot.y < 4 ? grid[i + 5] : undefined,
+          ].map((neighbor) => {
+            if (neighbor) {
+              console.log(neighbor)
+            }
+            if (neighbor && typeof neighbor.icon == "undefined") {
+              // TODO: Track child count and then randomize this
+              newGrid[neighbor.i].icon = "🎃"
+              newGrid[neighbor.i].stem = plot.i
+              appendLog(`Growing ${newGrid[neighbor.i].icon} at ${String(neighbor.x)},${String(neighbor.y)}.`)
+            }
+          })
+        }
       }
     })
     setGrid(newGrid)
@@ -65,7 +68,7 @@ export function Field({ appendLog }: { appendLog: (message: string) => void }) {
   function handleClear(e: React.MouseEvent) {
     e.stopPropagation()
     setGrid(emptyGrid())
-    appendLog("Cleared the field.")
+    clearLog()
   }
 
   return (

@@ -8,11 +8,22 @@ export interface Plot {
   stem?: number,
 }
 
+// TODO: icon enum
+
+const stemClasses: string[] = []
+stemClasses[-5] = "stem stemDown"
+stemClasses[5] = "stem stemUp"
+stemClasses[-1] = "stem stemRight"
+stemClasses[1] = "stem stemLeft"
+
 export type PlotClickHandler = (e: React.MouseEvent, plot: Plot) => void
 
 export function FieldPlot({ onClick, plot }: { onClick: PlotClickHandler, plot: Plot }) {
   return <div className="plot" onClick={(e) => { onClick(e, plot); }}>
-    {plot.icon}
-    {/* <br />{plot.i}:{plot.x},{plot.y} */}
+    <div className="icon">
+      {plot.icon}
     </div>
+    {/* <br />{plot.i}:{plot.x},{plot.y} */}
+    {typeof plot.stem !== "undefined" ? <div className={stemClasses[plot.i - plot.stem]} /> : ''}
+  </div>
 }

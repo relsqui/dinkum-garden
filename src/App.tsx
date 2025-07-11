@@ -6,22 +6,29 @@ function App() {
   const [logContents, setLogContents] = useState<LogLine[]>([])
 
   function appendLog(message: string) {
-    if (logContents.length == 0) {
-      setLogContents([{ message, count: 1 }])
-    } else {
-      const lastLog = logContents.slice(-1)[0]
-      if (message == lastLog.message) {
-        lastLog.count++
-        setLogContents([...logContents.slice(0, -1), lastLog])
+    setLogContents(prevLogContents => {
+      console.log(`Appending log: ${message}`)
+      if (prevLogContents.length == 0) {
+        return [{ message, count: 1 }]
       } else {
-        setLogContents([...logContents, { message, count: 1 }])
+        const lastLog = prevLogContents.slice(-1)[0]
+        if (message == lastLog.message) {
+          lastLog.count++
+          return [...prevLogContents.slice(0, -1), lastLog]
+        } else {
+          return [...prevLogContents, { message, count: 1 }]
+        }
       }
-    }
+    })
+  }
+
+  function clearLog() {
+    setLogContents([{ message: "Cleared.", count: 1 }])
   }
 
   return (
     <>
-      <Field appendLog={appendLog} />
+      <Field appendLog={appendLog} clearLog={clearLog} />
       <Log logContents={logContents} />
     </>
   )

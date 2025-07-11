@@ -9,7 +9,7 @@ export function Log({ logContents }: { logContents: LogLine[] }) {
             {logContents.map((logLine, i) => (
                 <div className="logLine" key={i}>
                     {logLine.message}
-                    {logLine.count > 1 ? ` (x${logLine.count})` : ''}
+                    {logLine.count > 1 ? ` (x${String(logLine.count)})` : ''}
                 </div>
             )
             )}
