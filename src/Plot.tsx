@@ -14,7 +14,7 @@ function getStem(plot: Plot) {
 }
 
 function getInfo(plot: Plot) {
-  return [plot.i, plot.stem ? plot.stem : plot.children]
+  return [plot.i, plot.neighbors.length, plot.children]
     .map(String)
     .join(" / ");
 }
