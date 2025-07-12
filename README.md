@@ -1,4 +1,4 @@
-# WIP Dinkum squash garden experiment
+# WIP Dinkum gourd garden experiment
 
 Simulating pumpkins for fun and profit.
 

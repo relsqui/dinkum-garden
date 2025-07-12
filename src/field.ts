@@ -15,15 +15,15 @@ export function getEmptyField() {
 
 export function scoreField(field: Plot[]) {
   // These values are for pumpkins
-  const squashPrice = 3120;
+  const gourdPrice = 3120;
   const seedPrice = 780;
   const seeds = field.filter((plot) => plot.icon == "🌱").length;
-  const squash = field.filter((plot) => plot.icon == "🎃").length;
-  const score = squash * squashPrice - seeds * seedPrice;
+  const gourd = field.filter((plot) => plot.icon == "🎃").length;
+  const score = gourd * gourdPrice - seeds * seedPrice;
   return {
     seeds,
-    squash,
+    gourd,
     score,
-    summary: `${String(score)} points for ${String(squash)} squash from ${String(seeds)} seeds`,
+    summary: `${String(score)} points for ${String(gourd)} gourds from ${String(seeds)} seeds`,
   };
 }
