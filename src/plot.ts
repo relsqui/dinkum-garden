@@ -14,8 +14,8 @@ export const Emoji = {
   Melon: "🍈",
   Sprout: "🌱",
   Water: "💧",
-  Star: "⭐"
-}
+  Star: "⭐",
+};
 
 // TODO: icon enum
 
@@ -43,3 +43,17 @@ export function coordString(plot: Plot): string {
 }
 
 export type PlotClickHandler = (e: React.MouseEvent, plot: Plot) => void;
+
+export const stemClasses: string[] = [];
+stemClasses[-5] = "stem stemDown";
+stemClasses[5] = "stem stemUp";
+stemClasses[-1] = "stem stemRight";
+stemClasses[1] = "stem stemLeft";
+
+export function getInfo(plot: Plot, debug: boolean) {
+  const info: (String | number)[] = [plot.i];
+  if (debug) {
+    info.push(plot.neighbors.length, String(plot.children));
+  }
+  return info.map(String).join(" / ");
+}

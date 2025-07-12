@@ -1,25 +1,4 @@
-import type { Plot, PlotClickHandler } from "./plot";
-
-const stemClasses: string[] = [];
-stemClasses[-5] = "stem stemDown";
-stemClasses[5] = "stem stemUp";
-stemClasses[-1] = "stem stemRight";
-stemClasses[1] = "stem stemLeft";
-
-function getStem(plot: Plot) {
-  if (plot.stem === null) {
-    return "";
-  }
-  return <div className={stemClasses[plot.i - plot.stem]} />;
-}
-
-function getInfo(plot: Plot, debug: boolean) {
-  const info: (String | number)[] = [plot.i];
-  if (debug) {
-    info.push(plot.neighbors.length, String(plot.children));
-  }
-  return info.map(String).join(" / ");
-}
+import { getInfo, stemClasses, type Plot, type PlotClickHandler } from "./plot";
 
 export function FieldPlot({
   onClick,
@@ -39,7 +18,11 @@ export function FieldPlot({
     >
       <div className="plotInfo">{getInfo(plot, debug)}</div>
       <div className="icon">{plot.icon}</div>
-      {getStem(plot)}
+      {plot.stem === null ? (
+        ""
+      ) : (
+        <div className={stemClasses[plot.i - plot.stem]} />
+      )}
     </div>
   );
 }
