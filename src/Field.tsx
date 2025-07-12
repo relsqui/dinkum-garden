@@ -1,20 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
-import { FieldPlot, emptyPlot, type Plot } from "./Plot";
+import { FieldPlot } from "./Plot";
+import { emptyPlot, type Plot } from "./plot";
+import { emptyField } from "./field";
 
-export function emptyField() {
-  const field: Plot[] = [];
-  let i = 0;
-  for (let y = 0; y < 5; y++) {
-    for (let x = 0; x < 5; x++) {
-      field.push(emptyPlot(x, y));
-      i = i + 1;
-    }
-  }
-  field[12].icon = "💧";
-  return field;
-}
-
-export type fieldProps = {
+export interface fieldProps {
   field: Plot[];
   setField: Dispatch<SetStateAction<Plot[]>>;
   appendLog: (message: string) => void;
@@ -34,7 +23,7 @@ export function Field({ field, setField, appendLog, clearLog }: fieldProps) {
         `Removing ${plot.icon} at ${String(plot.x)},${String(plot.y)}.`
       );
       plot.children.map((i) => {
-        delete newField[i].stem;
+        newField[i].stem = null;
       });
       newField[plot.i] = emptyPlot(plot.x, plot.y);
     } else {

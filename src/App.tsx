@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Field, emptyField } from "./Field";
+import { Field } from "./Field";
 import { Log, type LogLine } from "./Log";
+import { emptyField } from "./field";
 
 function App() {
   const [field, setField] = useState(emptyField);
