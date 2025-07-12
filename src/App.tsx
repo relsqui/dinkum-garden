@@ -26,9 +26,16 @@ function App() {
     setLogContents([{ message: "Cleared.", count: 1 }]);
   }
 
+  const fieldProps = {
+    field,
+    setField,
+    appendLog,
+    clearLog,
+  };
+
   return (
     <>
-      <Field field={field} setField={setField} appendLog={appendLog} clearLog={clearLog} />
+      <Field {...fieldProps} />
       <Log logContents={logContents} />
     </>
   );

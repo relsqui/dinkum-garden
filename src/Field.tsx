@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from "react";
 import { FieldPlot, emptyPlot, type Plot } from "./Plot";
 
 export function emptyField() {
@@ -13,18 +14,14 @@ export function emptyField() {
   return field;
 }
 
-export function Field({
-  field,
-  setField,
-  appendLog,
-  clearLog,
-}: {
-  field: Plot[],
-  setField: any,
+export type fieldProps = {
+  field: Plot[];
+  setField: Dispatch<SetStateAction<Plot[]>>;
   appendLog: (message: string) => void;
   clearLog: () => void;
-}) {
+};
 
+export function Field({ field, setField, appendLog, clearLog }: fieldProps) {
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
     e.stopPropagation();
     if (plot.x == plot.y && plot.x == 2) {
@@ -34,7 +31,7 @@ export function Field({
     const newField = [...field];
     if (plot.icon) {
       appendLog(
-        `Removing ${plot.icon} at ${String(plot.x)},${String(plot.y)}.`,
+        `Removing ${plot.icon} at ${String(plot.x)},${String(plot.y)}.`
       );
       plot.children.map((i) => {
         delete newField[i].stem;
@@ -44,7 +41,9 @@ export function Field({
       newField[plot.i] = { ...plot };
       newField[plot.i].icon = "🌱";
       appendLog(
-        `Adding ${newField[plot.i].icon} at ${String(plot.x)},${String(plot.y)}.`,
+        `Adding ${newField[plot.i].icon} at ${String(plot.x)},${String(
+          plot.y
+        )}.`
       );
     }
     setField(newField);
@@ -56,7 +55,7 @@ export function Field({
     for (let i = 0; i < field.length; i++) {
       // Update the state for each plot so they can see each other's changes
       // Otherwise, they can both try to grow into a shared adjacent plot
-      setField((field: Plot[]) => {
+      setField((field) => {
         const plot = field[i];
         if (plot.icon != "🌱") {
           return field;
@@ -76,8 +75,8 @@ export function Field({
             newField[i].children.push(neighbor.i);
             appendLog(
               `Growing ${newField[neighbor.i].icon} at ${String(
-                neighbor.x,
-              )},${String(neighbor.y)}.`,
+                neighbor.x
+              )},${String(neighbor.y)}.`
             );
           }
         });
