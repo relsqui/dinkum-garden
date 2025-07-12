@@ -80,7 +80,7 @@ stemClasses[-1] = "stem stemRight";
 stemClasses[1] = "stem stemLeft";
 
 export function getInfo(plot: Plot, debug: boolean) {
-  const info: (String | number)[] = [plot.i];
+  const info: (string | number)[] = [plot.i];
   if (debug && import.meta.env.MODE != "production") {
     info.push(plot.age, String(plot.children));
   }

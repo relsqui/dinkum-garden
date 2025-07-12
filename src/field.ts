@@ -81,7 +81,7 @@ function growMessage(plot: Plot) {
 
 export function iterate(field: Plot[]): [Plot[], string[]] {
   const logMessages = [];
-  let nextField = copyField(field);
+  const nextField = copyField(field);
   for (const plot of nextField) {
     const nextPlot = copyPlot(plot);
     const growDestination = getGrowDestination(nextField, nextPlot.i);
@@ -107,11 +107,11 @@ export function iterate(field: Plot[]): [Plot[], string[]] {
 export function iterateUntil(
   field: Plot[],
   doneIterating: (field: Plot[], t: number) => boolean,
-  maxSteps: number = 1000
+  maxSteps = 1000
 ): [Plot[], string[], number] {
   let t = 0;
   let testField = copyField(field);
-  let logMessages = [];
+  const logMessages = [];
   let newMessages;
   for (t = 0; t < maxSteps; t++) {
     [testField, newMessages] = iterate(testField);
