@@ -16,9 +16,8 @@
 }
 
 :root {
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgb(226, 226, 242);
+  background-color: #4e3a14;
 }
 
 div .fieldContainer {
@@ -46,7 +45,7 @@ div .plot {
 }
 
 div .plotInfo {
-  color: rgba(255, 255, 255, 0.87);
+  color: white;
   font-size: small;
   position: absolute;
   top: 5px;
@@ -55,12 +54,15 @@ div .plotInfo {
 
 div .icon {
   z-index: 10;
+  /* shoutout to https://codepen.io/bramus/pen/gwvOLY */
+  text-shadow: 1px 1px 0 #70ce60, -1px 1px 0 #70ce60, 1px -1px 0 #70ce60,
+    -1px -1px 0 #70ce60;
 }
 
 div .stem {
   position: absolute;
-  border-left: 3px #70ce60 dotted;
-  border-bottom: 3px #70ce60 dotted;
+  border-left: 3px #70ce60 ridge;
+  border-bottom: 3px #70ce60 ridge;
   inset-block-start: 55px;
   z-index: 5;
 }
@@ -93,6 +95,9 @@ div .log {
   min-width: 500px;
   height: 500px;
   overflow: auto;
+  background-color: rgba(12, 0, 46, 0.1);
+  border-radius: 1em;
+  padding: 0.5em 1em;
 }
 
 div .logLine {
@@ -108,6 +113,9 @@ a {
 a:hover {
   color: #535bf2;
 }
+a:hover {
+  color: #747bff;
+}
 
 button {
   border-radius: 8px;
@@ -117,29 +125,14 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  align-self: center;
+  background-color: #bfc1dd;
+  color: #3d382d;
+  font-weight: bold;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #8190ff;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #213547;
-    color: #ffffff;
-  }
 }

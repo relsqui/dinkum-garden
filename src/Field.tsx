@@ -73,7 +73,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       if (growInto === null) {
         continue;
       }
-      appendLog(`Growing 🎃 at ${coordString(prevField[i])}.`);
+      appendLog(`Growing 🎃 at ${String(growInto)} (from ${String(i)}).`);
       nextField = prevField.map((prevPlot, j) => {
         const newPlot = { ...prevPlot };
         newPlot.children = [...prevPlot.children];

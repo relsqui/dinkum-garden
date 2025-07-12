@@ -13,20 +13,22 @@ function getStem(plot: Plot) {
   return <div className={stemClasses[plot.i - plot.stem]} />;
 }
 
-function getInfo(plot: Plot) {
-  return [plot.i, plot.neighbors.length, plot.children]
-    .map(String)
-    .join(" / ");
+function getInfo(plot: Plot, debug: boolean) {
+  const info: (String | number)[] = [plot.i];
+  if (debug) {
+    info.push(plot.neighbors.length, String(plot.children));
+  }
+  return info.map(String).join(" / ");
 }
 
 export function FieldPlot({
   onClick,
   plot,
-  debug
+  debug,
 }: {
   onClick: PlotClickHandler;
   plot: Plot;
-  debug?: boolean;
+  debug: boolean;
 }) {
   return (
     <div
@@ -35,7 +37,7 @@ export function FieldPlot({
         onClick(e, plot);
       }}
     >
-      <div className="plotInfo">{debug ? getInfo(plot) : ""}</div>
+      <div className="plotInfo">{getInfo(plot, debug)}</div>
       <div className="icon">{plot.icon}</div>
       {getStem(plot)}
     </div>
