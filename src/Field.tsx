@@ -65,13 +65,13 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     }
   }
 
-  function handleClear(e: React.MouseEvent, icon?: StateString) {
+  function handleClear(e: React.MouseEvent, state?: StateString) {
     e.stopPropagation();
-    if (typeof icon === "undefined") {
+    if (typeof state === "undefined") {
       clearLog();
     } else {
       let nextField = field;
-      for (const plot of field.filter((plot) => plot.state == icon)) {
+      for (const plot of field.filter((plot) => plot.state == state)) {
         nextField = removePlot(nextField, plot.i);
       }
       setField(nextField);
@@ -97,14 +97,14 @@ export function Field({ appendLog, clearLog }: fieldProps) {
             <button onClick={handleIterateUntilFull}>Until fully grown</button>
             {fullyGrown(field) ? PlotState.Star : ""}
           </div>
-          {[PlotState.Pumpkin, PlotState.Sprout].map((emoji) => (
+          {[PlotState.Pumpkin, PlotState.Sprout].map((state) => (
             <button
               onClick={(e) => {
-                handleClear(e, emoji);
+                handleClear(e, state);
               }}
-              key={emoji}
+              key={state}
             >
-              Clear {emoji}
+              Clear {state}
             </button>
           ))}
           <button onClick={handleClear}>Clear log</button>

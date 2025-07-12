@@ -117,8 +117,8 @@ export function removePlot(field: Plot[], i: number) {
   return nextField;
 }
 
-export function addPlot(field: Plot[], i: number, icon: StateString) {
+export function addPlot(field: Plot[], i: number, state: StateString) {
   const nextField = copyField(field);
-  nextField[i].state = icon;
+  nextField[i].state = state;
   return nextField;
 }

@@ -53,7 +53,7 @@ div .plotInfo {
   left: 5px;
 }
 
-div .icon {
+div .plotState {
   z-index: 10;
   /* shoutout to https://codepen.io/bramus/pen/gwvOLY */
   text-shadow: 1px 1px 0 var(--stem-color), -1px 1px 0 var(--stem-color), 1px -1px 0 var(--stem-color),

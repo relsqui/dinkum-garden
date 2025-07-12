@@ -17,7 +17,7 @@ export function FieldPlot({
       }}
     >
       <div className="plotInfo">{getInfo(plot, debug)}</div>
-      <div className="icon">{plot.state}</div>
+      <div className="plotState">{plot.state}</div>
       {plot.stem === null ? (
         ""
       ) : (
