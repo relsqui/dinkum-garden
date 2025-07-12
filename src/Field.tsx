@@ -11,6 +11,23 @@ export interface fieldProps {
 export function Field({ appendLog, clearLog }: fieldProps) {
   const [field, setField] = useState(emptyField);
 
+  function removePlot(tempField: Plot[], i: number) {
+    const plot = tempField[i];
+    if (plot.icon == "🌱") {
+      plot.children.map((i) => {
+        tempField[i].stem = null;
+      });
+    } else if (plot.icon == "🎃") {
+      const stem = plot.stem;
+      if (stem !== null) {
+        tempField[stem].children = field[stem].children.filter(
+          (c) => c != plot.i
+        );
+      }
+    }
+    tempField[i] = emptyPlot(plot.x, plot.y);
+  }
+
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
     e.stopPropagation();
     if (plot.icon == "💧") {
@@ -18,21 +35,10 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       return;
     }
     const newField = [...field];
-    if (plot.icon == "🌱") {
+    if (["🌱", "🎃"].includes(plot.icon)) {
       appendLog(`Removing ${plot.icon} at ${coordString(plot)}.`);
-      plot.children.map((i) => {
-        newField[i].stem = null;
-      });
-      newField[plot.i] = emptyPlot(plot.x, plot.y);
-    } else if (plot.icon == "🎃") {
-      const stem = plot.stem;
-      if (stem !== null) {
-        newField[stem].children = field[stem].children.filter(
-          (c) => c != plot.i
-        );
-      }
-      newField[plot.i] = emptyPlot(plot.x, plot.y);
-    } else {
+      removePlot(newField, plot.i);
+    } else if (plot.icon == "") {
       newField[plot.i] = { ...plot };
       newField[plot.i].icon = "🌱";
       appendLog(`Adding ${newField[plot.i].icon} at ${coordString(plot)}.`);
@@ -126,19 +132,21 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     }
   }
 
-  function handleClear(e: React.MouseEvent) {
+  function handleClear(e: React.MouseEvent, icon?: string) {
     e.stopPropagation();
-    setField(emptyField());
-    clearLog();
+    if (typeof icon === "undefined") {
+      clearLog();
+    } else {
+      const nextField = [...field];
+      for (const plot of field.filter((plot) => plot.icon == icon)) {
+        removePlot(nextField, plot.i);
+      }
+      setField(nextField);
+    }
   }
 
   return (
     <>
-      {/* <textarea
-        cols={60}
-        style={{ margin: "0 10px" }}
-        defaultValue={JSON.stringify(field, null, 2)}
-      ></textarea> */}
       <div className="fieldContainer">
         <div className="field">
           {field.map((plot) => (
@@ -146,10 +154,26 @@ export function Field({ appendLog, clearLog }: fieldProps) {
           ))}
         </div>
         <div className="buttonBar">
-          <button onClick={handleIterate}>Iterate</button>
-          <button onClick={handleIterateUntilFull}>Until fully grown</button>
-          <button onClick={handleClear}>Clear</button>
-          {fullyGrown(field) ? "⭐" : ""}
+          <div>
+            <button onClick={handleIterate}>Iterate</button>
+            <button onClick={handleIterateUntilFull}>Until fully grown</button>
+            {fullyGrown(field) ? "⭐" : ""}
+          </div>
+          <button
+            onClick={(e) => {
+              handleClear(e, "🎃");
+            }}
+          >
+            Clear 🎃
+          </button>
+          <button
+            onClick={(e) => {
+              handleClear(e, "🌱");
+            }}
+          >
+            Clear 🌱
+          </button>
+          <button onClick={handleClear}>Clear log</button>
         </div>
       </div>
     </>
