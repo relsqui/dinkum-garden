@@ -10,7 +10,7 @@ export interface Plot {
 
 // TODO: icon enum
 
-export function emptyPlot(x: number, y: number): Plot {
+export function getEmptyPlot(x: number, y: number): Plot {
   const i = y * 5 + x;
   const neighbors = [
     x > 0 ? i - 1 : null,

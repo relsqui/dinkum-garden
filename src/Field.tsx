@@ -1,6 +1,6 @@
 import { FieldPlot } from "./Plot";
-import { coordString, emptyPlot, type Plot } from "./plot";
-import { emptyField } from "./field";
+import { coordString, getEmptyPlot, type Plot } from "./plot";
+import { getEmptyField, scoreField } from "./field";
 import { useState } from "react";
 
 export interface fieldProps {
@@ -9,7 +9,7 @@ export interface fieldProps {
 }
 
 export function Field({ appendLog, clearLog }: fieldProps) {
-  const [field, setField] = useState(emptyField);
+  const [field, setField] = useState(getEmptyField);
 
   function removePlot(tempField: Plot[], i: number) {
     const plot = tempField[i];
@@ -25,7 +25,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
         );
       }
     }
-    tempField[i] = emptyPlot(plot.x, plot.y);
+    tempField[i] = getEmptyPlot(plot.x, plot.y);
   }
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
@@ -116,9 +116,6 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     let t;
     let testField = field;
     for (t = 0; t < 1000; t++) {
-      // if (t > 0 && t / 100 == Math.floor(t / 100)) {
-      //   console.log(`Step ${t} ...`);
-      // }
       testField = iterate(testField);
       if (fullyGrown(testField)) {
         break;
@@ -129,6 +126,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       appendLog("Timed out after 1000 steps.");
     } else {
       appendLog(`Done growing after ${String(t)} steps.`);
+      appendLog(`Score: ${scoreField(testField).summary}.`)
     }
   }
 
@@ -150,7 +148,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       <div className="fieldContainer">
         <div className="field">
           {field.map((plot) => (
-            <FieldPlot onClick={handlePlotClick} plot={plot} key={plot.i} />
+            <FieldPlot onClick={handlePlotClick} plot={plot} key={plot.i} debug={false} />
           ))}
         </div>
         <div className="buttonBar">

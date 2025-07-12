@@ -22,9 +22,11 @@ function getInfo(plot: Plot) {
 export function FieldPlot({
   onClick,
   plot,
+  debug
 }: {
   onClick: PlotClickHandler;
   plot: Plot;
+  debug?: boolean;
 }) {
   return (
     <div
@@ -33,7 +35,7 @@ export function FieldPlot({
         onClick(e, plot);
       }}
     >
-      <div className="plotInfo">{getInfo(plot)}</div>
+      <div className="plotInfo">{debug ? getInfo(plot) : ""}</div>
       <div className="icon">{plot.icon}</div>
       {getStem(plot)}
     </div>
