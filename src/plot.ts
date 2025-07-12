@@ -23,11 +23,17 @@ export const PlotState = {
 // the erasableSyntaxOnly setting is on.
 export type StateString = typeof PlotState[keyof typeof PlotState]
 
+export const maxAge = {
+  [Emoji.Sprout]: 11,
+  [Emoji.Pumpkin]: 7,
+}
+
 export interface Plot {
   x: number;
   y: number;
   i: number;
   state: StateString;
+  age: number;
   neighbors: number[];
   children: number[];
   stem: number | null;
@@ -46,6 +52,7 @@ export function getEmptyPlot(x: number, y: number): Plot {
     y,
     i,
     state: PlotState.Empty,
+    age: 0,
     neighbors,
     children: [],
     stem: null,
@@ -61,8 +68,11 @@ export function copyPlot(plot: Plot) {
   return nextPlot;
 }
 
-export type PlotClickHandler = (e: React.MouseEvent, plot: Plot) => void;
+export function isCropState(state: StateString) {
+  return [PlotState.Pumpkin, PlotState.Melon, PlotState.Sprout].includes(state);
+}
 
+// The keys here are the diff between the stem index and gourd index.
 export const stemClasses: string[] = [];
 stemClasses[-5] = "stem stemDown";
 stemClasses[5] = "stem stemUp";
@@ -71,8 +81,8 @@ stemClasses[1] = "stem stemLeft";
 
 export function getInfo(plot: Plot, debug: boolean) {
   const info: (String | number)[] = [plot.i];
-  if (debug) {
-    info.push(plot.neighbors.length, String(plot.children));
+  if (debug && import.meta.env.MODE != "production") {
+    info.push(plot.age, String(plot.children));
   }
   return info.map(String).join(" / ");
 }

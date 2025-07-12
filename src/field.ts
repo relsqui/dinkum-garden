@@ -4,6 +4,8 @@ import {
   copyPlot,
   type Plot,
   type StateString,
+  isCropState,
+  maxAge,
 } from "./plot";
 
 export function getEmptyField() {
@@ -61,45 +63,43 @@ export function fullyGrown(field: Plot[]) {
 
 function getGrowDestination(field: Plot[], i: number): number | null {
   const plot = field[i];
-  if (plot.state != PlotState.Sprout) {
-    return null;
-  }
+  if (plot.state != PlotState.Sprout) return null;
+  if (plot.age < maxAge[plot.state]) return null;
   const growChance = plot.children.length == 0 ? 1 : 0.1 / plot.children.length;
-  if (Math.random() > growChance) {
-    return null;
-  }
+  if (Math.random() > growChance) return null;
   const emptyNeighbors = plot.neighbors.filter(
     (j) => field[j].state == PlotState.Empty
   );
-  if (emptyNeighbors.length == 0) {
-    return null;
-  }
+  if (emptyNeighbors.length == 0) return null;
   return emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
 }
 
-export function iterate(prevField: Plot[]): [Plot[], string[]] {
+function growMessage(plot: Plot) {
+  const [i, stem] = [plot.i, plot.stem].map(String);
+  return `Growing ${plot.state} at ${i} (from ${stem}).`;
+}
+
+export function iterate(field: Plot[]): [Plot[], string[]] {
   const logMessages = [];
-  // nextField needs a returnable value even if nothing grows.
-  let nextField = copyField(prevField);
-  for (let i = 0; i < prevField.length; i++) {
-    const growInto = getGrowDestination(prevField, i);
-    if (growInto === null) {
-      continue;
+  let nextField = copyField(field);
+  for (const plot of nextField) {
+    const nextPlot = copyPlot(plot);
+    const growDestination = getGrowDestination(nextField, nextPlot.i);
+    if (growDestination !== null) {
+      const child = copyPlot(nextField[growDestination]);
+      nextPlot.children.push(child.i);
+      child.state = PlotState.Pumpkin;
+      child.stem = nextPlot.i;
+      child.age = 1;
+      nextField[child.i] = child;
+      logMessages.push(growMessage(nextField[child.i]));
+    } else if (
+      isCropState(nextPlot.state) &&
+      nextPlot.age < maxAge[nextPlot.state]
+    ) {
+      nextPlot.age++;
     }
-    logMessages.push(
-      `Growing ${PlotState.Pumpkin} at ${String(growInto)} (from ${String(i)}).`
-    );
-    nextField = prevField.map((prevPlot, j) => {
-      const nextPlot = copyPlot(prevPlot);
-      if (j == i) {
-        nextPlot.children.push(growInto);
-      } else if (j == growInto) {
-        nextPlot.state = PlotState.Pumpkin;
-        nextPlot.stem = i;
-      }
-      return nextPlot;
-    });
-    prevField = nextField;
+    nextField[nextPlot.i] = nextPlot;
   }
   return [nextField, logMessages];
 }
@@ -107,7 +107,7 @@ export function iterate(prevField: Plot[]): [Plot[], string[]] {
 export function iterateUntil(
   field: Plot[],
   doneIterating: (field: Plot[], t: number) => boolean,
-  maxSteps: number = 1000,
+  maxSteps: number = 1000
 ): [Plot[], string[], number] {
   let t = 0;
   let testField = copyField(field);
@@ -127,8 +127,8 @@ export function removePlot(field: Plot[], i: number) {
   const nextField = copyField(field);
   const plot = nextField[i];
   if (plot.state == PlotState.Sprout) {
-    plot.children.map((i) => {
-      nextField[i].stem = null;
+    plot.children.map((c) => {
+      nextField[c].stem = null;
     });
   } else if (plot.state == PlotState.Pumpkin) {
     const stem = plot.stem;
@@ -145,5 +145,8 @@ export function removePlot(field: Plot[], i: number) {
 export function addPlot(field: Plot[], i: number, state: StateString) {
   const nextField = copyField(field);
   nextField[i].state = state;
+  if (isCropState(state)) {
+    nextField[i].age = 1;
+  }
   return nextField;
 }

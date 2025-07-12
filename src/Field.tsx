@@ -85,7 +85,7 @@ export function Field({
               onClick={handlePlotClick}
               plot={plot}
               key={plot.i}
-              debug={false}
+              debug={true}
             />
           ))}
         </div>
