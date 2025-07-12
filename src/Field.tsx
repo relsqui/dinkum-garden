@@ -1,5 +1,5 @@
 import { FieldPlot } from "./Plot";
-import { PlotState, type StateString, type Plot } from "./plot";
+import { PlotState, type StateString, type Plot, Emoji } from "./plot";
 import {
   addPlot,
   fullyGrown,
@@ -93,7 +93,7 @@ export function Field({
           <div>
             <button onClick={handleIterate}>Iterate</button>
             <button onClick={handleIterateUntilGrown}>Until fully grown</button>
-            {fullyGrown(field) ? PlotState.Star : ""}
+            {fullyGrown(field) ? Emoji.Star : ""}
           </div>
           {[PlotState.Pumpkin, PlotState.Sprout].map((state) => (
             <button

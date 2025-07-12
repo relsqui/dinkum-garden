@@ -1,14 +1,26 @@
-export const PlotState = {
-  Empty: "",
+export const Emoji = {
   Pumpkin: "🎃",
   Melon: "🍈",
   Sprout: "🌱",
   Water: "💧",
   Star: "⭐",
+};
+
+export const PlotState = {
+  Empty: "",
+  Pumpkin: Emoji.Pumpkin,
+  Melon: Emoji.Melon,
+  Sprout: Emoji.Sprout,
+  Water: Emoji.Water,
 } as const;
 
 // Shoutout to https://stackoverflow.com/a/60148768
-// I haven't totally wrapped my head around how this works
+// The "as const" assertion means that typeof Plotstate isn't {[string]: string},
+// it's a map of the union of specific keys to the union of specific values.
+// So keyof typeof PlotState is the set of keys, and typeof PlotState[all keys]
+// is the set of values.
+// All this is a workaround to get the features of a typescript Enum while
+// the erasableSyntaxOnly setting is on.
 export type StateString = typeof PlotState[keyof typeof PlotState]
 
 export interface Plot {
