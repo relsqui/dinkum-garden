@@ -1,6 +1,7 @@
 import { FieldPlot } from "./Plot";
-import { Emoji, coordString, type Plot } from "./plot";
+import { PlotState, type StateString, type Plot } from "./plot";
 import {
+  addPlot,
   fullyGrown,
   getEmptyField,
   iterate,
@@ -19,26 +20,27 @@ export function Field({ appendLog, clearLog }: fieldProps) {
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
     e.stopPropagation();
-    if (plot.icon == Emoji.Water) {
+    let nextField;
+    if (plot.state == PlotState.Water) {
       appendLog("Can't plant over the sprinkler.");
-      return;
+    } else if (plot.state == PlotState.Empty) {
+      appendLog(`Adding ${PlotState.Sprout} at ${String(plot.i)}.`);
+      nextField = addPlot(field, plot.i, PlotState.Sprout);
+    } else if (([PlotState.Sprout, PlotState.Pumpkin] as StateString[]).includes(plot.state)) {
+      appendLog(`Removing ${plot.state} at ${String(plot.i)}.`);
+      nextField = removePlot(field, plot.i);
     }
-    const newField = [...field];
-    if ([Emoji.Sprout, Emoji.Pumpkin].includes(plot.icon)) {
-      appendLog(`Removing ${plot.icon} at ${coordString(plot)}.`);
-      removePlot(newField, plot.i);
-    } else if (plot.icon == Emoji.Empty) {
-      newField[plot.i] = { ...plot };
-      newField[plot.i].icon = Emoji.Sprout;
-      appendLog(`Adding ${newField[plot.i].icon} at ${coordString(plot)}.`);
+    if (nextField) {
+      setField(nextField);
     }
-    setField(newField);
   }
 
   function handleIterate(e: React.MouseEvent) {
     e.stopPropagation();
     appendLog("Iterating ...");
-    setField(iterate(field, appendLog));
+    const [nextField, logMessages] = iterate(field);
+    logMessages.map(appendLog);
+    setField(nextField);
   }
 
   function handleIterateUntilFull(e: React.MouseEvent) {
@@ -46,8 +48,10 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     appendLog("Iterating until fully grown ...");
     let t;
     let testField = field;
+    let logMessages;
     for (t = 0; t < 1000; t++) {
-      testField = iterate(testField, appendLog);
+      [testField, logMessages] = iterate(testField);
+      logMessages.map(appendLog);
       if (fullyGrown(testField)) {
         break;
       }
@@ -61,14 +65,14 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     }
   }
 
-  function handleClear(e: React.MouseEvent, icon?: string) {
+  function handleClear(e: React.MouseEvent, icon?: StateString) {
     e.stopPropagation();
     if (typeof icon === "undefined") {
       clearLog();
     } else {
-      const nextField = [...field];
-      for (const plot of field.filter((plot) => plot.icon == icon)) {
-        removePlot(nextField, plot.i);
+      let nextField = field;
+      for (const plot of field.filter((plot) => plot.state == icon)) {
+        nextField = removePlot(nextField, plot.i);
       }
       setField(nextField);
     }
@@ -91,9 +95,9 @@ export function Field({ appendLog, clearLog }: fieldProps) {
           <div>
             <button onClick={handleIterate}>Iterate</button>
             <button onClick={handleIterateUntilFull}>Until fully grown</button>
-            {fullyGrown(field) ? Emoji.Star : ""}
+            {fullyGrown(field) ? PlotState.Star : ""}
           </div>
-          {[Emoji.Pumpkin, Emoji.Sprout].map((emoji) => (
+          {[PlotState.Pumpkin, PlotState.Sprout].map((emoji) => (
             <button
               onClick={(e) => {
                 handleClear(e, emoji);

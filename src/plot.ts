@@ -1,23 +1,25 @@
-export interface Plot {
-  x: number;
-  y: number;
-  i: number;
-  icon: string;
-  neighbors: number[];
-  children: number[];
-  stem: number | null;
-}
-
-export const Emoji = {
+export const PlotState = {
   Empty: "",
   Pumpkin: "🎃",
   Melon: "🍈",
   Sprout: "🌱",
   Water: "💧",
   Star: "⭐",
-};
+} as const;
 
-// TODO: icon enum
+// Shoutout to https://stackoverflow.com/a/60148768
+// I haven't totally wrapped my head around how this works
+export type StateString = typeof PlotState[keyof typeof PlotState]
+
+export interface Plot {
+  x: number;
+  y: number;
+  i: number;
+  state: StateString;
+  neighbors: number[];
+  children: number[];
+  stem: number | null;
+}
 
 export function getEmptyPlot(x: number, y: number): Plot {
   const i = y * 5 + x;
@@ -31,15 +33,20 @@ export function getEmptyPlot(x: number, y: number): Plot {
     x,
     y,
     i,
-    icon: Emoji.Empty,
+    state: PlotState.Empty,
     neighbors,
     children: [],
     stem: null,
   };
 }
 
-export function coordString(plot: Plot): string {
-  return [plot.x, plot.y].map(String).join(",");
+export function copyPlot(plot: Plot) {
+  const nextPlot = {...plot};
+  nextPlot.children = [...plot.children];
+  // Neighbors will never change for a given field size, but it's cheap
+  // to copy for the sake of making the function actually pure.
+  nextPlot.neighbors = [...plot.neighbors];
+  return nextPlot;
 }
 
 export type PlotClickHandler = (e: React.MouseEvent, plot: Plot) => void;

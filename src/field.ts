@@ -1,4 +1,4 @@
-import { Emoji, getEmptyPlot, type Plot } from "./plot";
+import { PlotState, getEmptyPlot, copyPlot, type Plot, type StateString } from "./plot";
 
 export function getEmptyField() {
   const field: Plot[] = [];
@@ -9,32 +9,42 @@ export function getEmptyField() {
       i = i + 1;
     }
   }
-  field[12].icon = "💧";
+  field[12].state = "💧";
   return field;
+}
+
+function copyField(field: Plot[]) {
+  return field.map(plot => copyPlot(plot));
 }
 
 export function scoreField(field: Plot[]) {
   // These values are for pumpkins
   const gourdPrice = 3120;
   const seedPrice = 780;
-  const seeds = field.filter((plot) => plot.icon == Emoji.Sprout).length;
-  const gourd = field.filter((plot) => plot.icon == Emoji.Pumpkin).length;
-  const score = gourd * gourdPrice - seeds * seedPrice;
+  const seeds = field.filter((plot) => plot.state == PlotState.Sprout).length;
+  const gourds = field.filter((plot) => plot.state == PlotState.Pumpkin).length;
+  const score = gourds * gourdPrice - seeds * seedPrice;
+  const summary = [
+    score,
+    "points for",
+    gourds,
+    "gourds from",
+    seeds,
+    "seeds",
+  ].join(" ");
   return {
     seeds,
-    gourd,
+    gourd: gourds,
     score,
-    summary: `${String(score)} points for ${String(gourd)} gourds from ${String(
-      seeds
-    )} seeds`,
+    summary,
   };
 }
 
-export function fullyGrown(testField: Plot[]) {
-  for (const plot of testField) {
-    if (plot.icon == Emoji.Sprout) {
+export function fullyGrown(field: Plot[]) {
+  for (const plot of field) {
+    if (plot.state == PlotState.Sprout) {
       for (const n of plot.neighbors) {
-        if (testField[n].icon == Emoji.Empty) {
+        if (field[n].state == PlotState.Empty) {
           return false;
         }
       }
@@ -43,9 +53,9 @@ export function fullyGrown(testField: Plot[]) {
   return true;
 }
 
-function getGrowDestination(testField: Plot[], i: number): number | null {
-  const plot = testField[i];
-  if (plot.icon != Emoji.Sprout) {
+function getGrowDestination(field: Plot[], i: number): number | null {
+  const plot = field[i];
+  if (plot.state != PlotState.Sprout) {
     return null;
   }
   const growChance = plot.children.length == 0 ? 1 : 0.1 / plot.children.length;
@@ -53,7 +63,7 @@ function getGrowDestination(testField: Plot[], i: number): number | null {
     return null;
   }
   const emptyNeighbors = plot.neighbors.filter(
-    (j) => testField[j].icon == Emoji.Empty
+    (j) => field[j].state == PlotState.Empty
   );
   if (emptyNeighbors.length == 0) {
     return null;
@@ -62,47 +72,53 @@ function getGrowDestination(testField: Plot[], i: number): number | null {
 }
 
 export function iterate(
-  prevField: Plot[],
-  appendLog: (message: string) => void
-) {
+  prevField: Plot[]
+): [Plot[], string[]] {
+  const logMessages = []
   // nextField needs a returnable value even if nothing grows.
-  let nextField = prevField;
+  let nextField = copyField(prevField);
   for (let i = 0; i < prevField.length; i++) {
     const growInto = getGrowDestination(prevField, i);
     if (growInto === null) {
       continue;
     }
-    appendLog(
-      `Growing ${Emoji.Pumpkin} at ${String(growInto)} (from ${String(i)}).`
+    logMessages.push(
+      `Growing ${PlotState.Pumpkin} at ${String(growInto)} (from ${String(i)}).`
     );
     nextField = prevField.map((prevPlot, j) => {
-      const newPlot = { ...prevPlot };
-      newPlot.children = [...prevPlot.children];
-      newPlot.neighbors = [...prevPlot.neighbors];
+      const nextPlot = copyPlot(prevPlot);
       if (j == i) {
-        newPlot.children.push(growInto);
+        nextPlot.children.push(growInto);
       } else if (j == growInto) {
-        newPlot.icon = Emoji.Pumpkin;
-        newPlot.stem = i;
+        nextPlot.state = PlotState.Pumpkin;
+        nextPlot.stem = i;
       }
-      return newPlot;
+      return nextPlot;
     });
     prevField = nextField;
   }
-  return nextField;
+  return [nextField, logMessages];
 }
 
 export function removePlot(field: Plot[], i: number) {
-  const plot = field[i];
-  if (plot.icon == Emoji.Sprout) {
+  const nextField = copyField(field);
+  const plot = nextField[i];
+  if (plot.state == PlotState.Sprout) {
     plot.children.map((i) => {
-      field[i].stem = null;
+      nextField[i].stem = null;
     });
-  } else if (plot.icon == Emoji.Pumpkin) {
+  } else if (plot.state == PlotState.Pumpkin) {
     const stem = plot.stem;
     if (stem !== null) {
-      field[stem].children = field[stem].children.filter((c) => c != plot.i);
+      nextField[stem].children = nextField[stem].children.filter((c) => c != plot.i);
     }
   }
-  field[i] = getEmptyPlot(plot.x, plot.y);
+  nextField[i] = getEmptyPlot(plot.x, plot.y);
+  return nextField;
+}
+
+export function addPlot(field: Plot[], i: number, icon: StateString) {
+  const nextField = copyField(field);
+  nextField[i].state = icon;
+  return nextField;
 }
