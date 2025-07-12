@@ -12,7 +12,7 @@ function App() {
       } else {
         // Even though we're slicing, we still need to make a copy to avoid our
         // slice containing a reference to the original count value.
-        const lastLog = {... prevLogContents.slice(-1)[0]};
+        const lastLog = { ...prevLogContents.slice(-1)[0] };
         if (message == lastLog.message) {
           lastLog.count++;
           return [...prevLogContents.slice(0, -1), lastLog];

@@ -56,7 +56,7 @@ div .icon {
   z-index: 10;
   /* shoutout to https://codepen.io/bramus/pen/gwvOLY */
   text-shadow: 1px 1px 0 white, -1px 1px 0 white, 1px -1px 0 white,
-    -1px -1px 0 white,
+    -1px -1px 0 white;
 }
 
 div .stem {
