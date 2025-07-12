@@ -55,14 +55,14 @@ div .plotInfo {
 div .icon {
   z-index: 10;
   /* shoutout to https://codepen.io/bramus/pen/gwvOLY */
-  text-shadow: 1px 1px 0 #70ce60, -1px 1px 0 #70ce60, 1px -1px 0 #70ce60,
-    -1px -1px 0 #70ce60;
+  text-shadow: 1px 1px 0 white, -1px 1px 0 white, 1px -1px 0 white,
+    -1px -1px 0 white,
 }
 
 div .stem {
   position: absolute;
-  border-left: 3px #70ce60 ridge;
-  border-bottom: 3px #70ce60 ridge;
+  border-left: 3px #70ce60 dotted;
+  border-bottom: 3px #70ce60 dotted;
   inset-block-start: 55px;
   z-index: 5;
 }
@@ -78,7 +78,7 @@ div .stemDown {
 }
 
 div .stemLeft {
-  inset-inline-start: -50px;
+  inset-inline-start: -55px;
   width: 100px;
 }
 
@@ -125,12 +125,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #bfc1dd;
-  color: #3d382d;
+  background-color: #ece6d4;
+  color: #332d36;
   font-weight: bold;
 }
 button:hover {
-  border-color: #8190ff;
+  border-color: #b6a064;
 }
 button:focus,
 button:focus-visible {
