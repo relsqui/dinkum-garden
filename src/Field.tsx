@@ -5,17 +5,19 @@ import {
   fullyGrown,
   getEmptyField,
   iterate,
+  iterateUntil,
   removePlot,
   scoreField,
 } from "./field";
 import { useState } from "react";
 
-export interface fieldProps {
+export function Field({
+  appendLog,
+  clearLog,
+}: {
   appendLog: (message: string) => void;
   clearLog: () => void;
-}
-
-export function Field({ appendLog, clearLog }: fieldProps) {
+}) {
   const [field, setField] = useState(getEmptyField);
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
@@ -26,7 +28,11 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     } else if (plot.state == PlotState.Empty) {
       appendLog(`Adding ${PlotState.Sprout} at ${String(plot.i)}.`);
       nextField = addPlot(field, plot.i, PlotState.Sprout);
-    } else if (([PlotState.Sprout, PlotState.Pumpkin] as StateString[]).includes(plot.state)) {
+    } else if (
+      ([PlotState.Sprout, PlotState.Pumpkin] as StateString[]).includes(
+        plot.state
+      )
+    ) {
       appendLog(`Removing ${plot.state} at ${String(plot.i)}.`);
       nextField = removePlot(field, plot.i);
     }
@@ -43,31 +49,23 @@ export function Field({ appendLog, clearLog }: fieldProps) {
     setField(nextField);
   }
 
-  function handleIterateUntilFull(e: React.MouseEvent) {
+  function handleIterateUntilGrown(e: React.MouseEvent) {
     e.stopPropagation();
     appendLog("Iterating until fully grown ...");
-    let t;
-    let testField = field;
-    let logMessages;
-    for (t = 0; t < 1000; t++) {
-      [testField, logMessages] = iterate(testField);
-      logMessages.map(appendLog);
-      if (fullyGrown(testField)) {
-        break;
-      }
-    }
-    setField(testField);
-    if (t == 1000) {
-      appendLog("Timed out after 1000 steps.");
+    const [nextField, logMessages, steps] = iterateUntil(field, fullyGrown);
+    if (steps == 1000) {
+      logMessages.push("Timed out after 1000 steps.");
     } else {
-      appendLog(`Done growing after ${String(t)} steps.`);
-      appendLog(`Score: ${scoreField(testField).summary}.`);
+      logMessages.push(`Done growing after ${String(steps)} steps.`);
+      logMessages.push(`Score: ${scoreField(nextField).summary}.`);
     }
+    logMessages.map(appendLog);
+    setField(nextField);
   }
 
-  function handleClear(e: React.MouseEvent, state?: StateString) {
+  function handleClear(e: React.MouseEvent, state: StateString | null = null) {
     e.stopPropagation();
-    if (typeof state === "undefined") {
+    if (state === null) {
       clearLog();
     } else {
       let nextField = field;
@@ -94,7 +92,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
         <div className="buttonBar">
           <div>
             <button onClick={handleIterate}>Iterate</button>
-            <button onClick={handleIterateUntilFull}>Until fully grown</button>
+            <button onClick={handleIterateUntilGrown}>Until fully grown</button>
             {fullyGrown(field) ? PlotState.Star : ""}
           </div>
           {[PlotState.Pumpkin, PlotState.Sprout].map((state) => (

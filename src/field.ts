@@ -1,4 +1,10 @@
-import { PlotState, getEmptyPlot, copyPlot, type Plot, type StateString } from "./plot";
+import {
+  PlotState,
+  getEmptyPlot,
+  copyPlot,
+  type Plot,
+  type StateString,
+} from "./plot";
 
 export function getEmptyField() {
   const field: Plot[] = [];
@@ -14,7 +20,7 @@ export function getEmptyField() {
 }
 
 function copyField(field: Plot[]) {
-  return field.map(plot => copyPlot(plot));
+  return field.map((plot) => copyPlot(plot));
 }
 
 export function scoreField(field: Plot[]) {
@@ -71,10 +77,8 @@ function getGrowDestination(field: Plot[], i: number): number | null {
   return emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
 }
 
-export function iterate(
-  prevField: Plot[]
-): [Plot[], string[]] {
-  const logMessages = []
+export function iterate(prevField: Plot[]): [Plot[], string[]] {
+  const logMessages = [];
   // nextField needs a returnable value even if nothing grows.
   let nextField = copyField(prevField);
   for (let i = 0; i < prevField.length; i++) {
@@ -100,6 +104,25 @@ export function iterate(
   return [nextField, logMessages];
 }
 
+export function iterateUntil(
+  field: Plot[],
+  doneIterating: (field: Plot[], t: number) => boolean,
+  maxSteps: number = 1000,
+): [Plot[], string[], number] {
+  let t = 0;
+  let testField = copyField(field);
+  let logMessages = [];
+  let newMessages;
+  for (t = 0; t < maxSteps; t++) {
+    [testField, newMessages] = iterate(testField);
+    logMessages.push(...newMessages);
+    if (doneIterating(testField, t)) {
+      break;
+    }
+  }
+  return [testField, logMessages, t];
+}
+
 export function removePlot(field: Plot[], i: number) {
   const nextField = copyField(field);
   const plot = nextField[i];
@@ -110,7 +133,9 @@ export function removePlot(field: Plot[], i: number) {
   } else if (plot.state == PlotState.Pumpkin) {
     const stem = plot.stem;
     if (stem !== null) {
-      nextField[stem].children = nextField[stem].children.filter((c) => c != plot.i);
+      nextField[stem].children = nextField[stem].children.filter(
+        (c) => c != plot.i
+      );
     }
   }
   nextField[i] = getEmptyPlot(plot.x, plot.y);
