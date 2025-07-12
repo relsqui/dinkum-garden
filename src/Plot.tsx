@@ -14,7 +14,9 @@ function getStem(plot: Plot) {
 }
 
 function getInfo(plot: Plot) {
-  return [plot.i, plot.children].map(String).join(": ");
+  return [plot.i, plot.stem ? plot.stem : plot.children]
+    .map(String)
+    .join(" / ");
 }
 
 export function FieldPlot({

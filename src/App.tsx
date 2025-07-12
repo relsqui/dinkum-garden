@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Field } from "./Field";
 import { Log, type LogLine } from "./Log";
-import { emptyField } from "./field";
 
 function App() {
-  const [field, setField] = useState(emptyField);
   const [logContents, setLogContents] = useState<LogLine[]>([]);
 
   function appendLog(message: string) {
@@ -12,7 +10,9 @@ function App() {
       if (prevLogContents.length == 0) {
         return [{ message, count: 1 }];
       } else {
-        const lastLog = prevLogContents.slice(-1)[0];
+        // Even though we're slicing, we still need to make a copy to avoid our
+        // slice containing a reference to the original count value.
+        const lastLog = {... prevLogContents.slice(-1)[0]};
         if (message == lastLog.message) {
           lastLog.count++;
           return [...prevLogContents.slice(0, -1), lastLog];
@@ -28,8 +28,6 @@ function App() {
   }
 
   const fieldProps = {
-    field,
-    setField,
     appendLog,
     clearLog,
   };

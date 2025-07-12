@@ -7,6 +7,8 @@ export interface Plot {
   stem: number | null;
 }
 
+// TODO: icon enum
+
 export function emptyPlot(x: number, y: number): Plot {
   return {
     x,
@@ -18,6 +20,8 @@ export function emptyPlot(x: number, y: number): Plot {
   };
 }
 
-// TODO: icon enum
+export function coordString(plot: Plot): string {
+    return [plot.x, plot.y].map(String).join(",");
+}
 
 export type PlotClickHandler = (e: React.MouseEvent, plot: Plot) => void;
