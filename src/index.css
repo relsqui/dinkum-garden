@@ -18,6 +18,7 @@
 :root {
   color: rgb(226, 226, 242);
   background-color: #4e3a14;
+  --stem-color: #70ce60;
 }
 
 div .fieldContainer {
@@ -55,14 +56,14 @@ div .plotInfo {
 div .icon {
   z-index: 10;
   /* shoutout to https://codepen.io/bramus/pen/gwvOLY */
-  text-shadow: 1px 1px 0 white, -1px 1px 0 white, 1px -1px 0 white,
-    -1px -1px 0 white;
+  text-shadow: 1px 1px 0 var(--stem-color), -1px 1px 0 var(--stem-color), 1px -1px 0 var(--stem-color),
+    -1px -1px 0 var(--stem-color);
 }
 
 div .stem {
   position: absolute;
-  border-left: 3px #70ce60 dotted;
-  border-bottom: 3px #70ce60 dotted;
+  border-left: 3px var(--stem-color) dotted;
+  border-bottom: 3px var(--stem-color) dotted;
   inset-block-start: 55px;
   z-index: 5;
 }
