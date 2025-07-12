@@ -8,6 +8,15 @@ export interface Plot {
   stem: number | null;
 }
 
+export const Emoji = {
+  Empty: "",
+  Pumpkin: "🎃",
+  Melon: "🍈",
+  Sprout: "🌱",
+  Water: "💧",
+  Star: "⭐"
+}
+
 // TODO: icon enum
 
 export function getEmptyPlot(x: number, y: number): Plot {
@@ -22,7 +31,7 @@ export function getEmptyPlot(x: number, y: number): Plot {
     x,
     y,
     i,
-    icon: "",
+    icon: Emoji.Empty,
     neighbors,
     children: [],
     stem: null,

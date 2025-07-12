@@ -1,4 +1,4 @@
-import { getEmptyPlot, type Plot } from "./plot";
+import { Emoji, getEmptyPlot, type Plot } from "./plot";
 
 export function getEmptyField() {
   const field: Plot[] = [];
@@ -17,8 +17,8 @@ export function scoreField(field: Plot[]) {
   // These values are for pumpkins
   const gourdPrice = 3120;
   const seedPrice = 780;
-  const seeds = field.filter((plot) => plot.icon == "🌱").length;
-  const gourd = field.filter((plot) => plot.icon == "🎃").length;
+  const seeds = field.filter((plot) => plot.icon == Emoji.Sprout).length;
+  const gourd = field.filter((plot) => plot.icon == Emoji.Pumpkin).length;
   const score = gourd * gourdPrice - seeds * seedPrice;
   return {
     seeds,

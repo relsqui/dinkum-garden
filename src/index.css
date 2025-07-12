@@ -127,7 +127,7 @@ button {
   font-family: inherit;
   background-color: #e3e9de;
   color: #332d36;
-  font-weight: bold;
+  font-weight: 600;
 }
 button:hover {
   border-color: #b6a064;

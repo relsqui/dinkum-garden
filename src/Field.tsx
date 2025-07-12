@@ -1,5 +1,5 @@
 import { FieldPlot } from "./Plot";
-import { coordString, getEmptyPlot, type Plot } from "./plot";
+import { Emoji, coordString, getEmptyPlot, type Plot } from "./plot";
 import { getEmptyField, scoreField } from "./field";
 import { useState } from "react";
 
@@ -13,11 +13,11 @@ export function Field({ appendLog, clearLog }: fieldProps) {
 
   function removePlot(tempField: Plot[], i: number) {
     const plot = tempField[i];
-    if (plot.icon == "🌱") {
+    if (plot.icon == Emoji.Sprout) {
       plot.children.map((i) => {
         tempField[i].stem = null;
       });
-    } else if (plot.icon == "🎃") {
+    } else if (plot.icon == Emoji.Pumpkin) {
       const stem = plot.stem;
       if (stem !== null) {
         tempField[stem].children = field[stem].children.filter(
@@ -30,17 +30,17 @@ export function Field({ appendLog, clearLog }: fieldProps) {
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
     e.stopPropagation();
-    if (plot.icon == "💧") {
+    if (plot.icon == Emoji.Water) {
       appendLog("Can't plant over the sprinkler.");
       return;
     }
     const newField = [...field];
-    if (["🌱", "🎃"].includes(plot.icon)) {
+    if ([Emoji.Sprout, Emoji.Pumpkin].includes(plot.icon)) {
       appendLog(`Removing ${plot.icon} at ${coordString(plot)}.`);
       removePlot(newField, plot.i);
-    } else if (plot.icon == "") {
+    } else if (plot.icon == Emoji.Empty) {
       newField[plot.i] = { ...plot };
-      newField[plot.i].icon = "🌱";
+      newField[plot.i].icon = Emoji.Sprout;
       appendLog(`Adding ${newField[plot.i].icon} at ${coordString(plot)}.`);
     }
     setField(newField);
@@ -48,7 +48,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
 
   function getGrowDestination(testField: Plot[], i: number): number | null {
     const plot = testField[i];
-    if (plot.icon != "🌱") {
+    if (plot.icon != Emoji.Sprout) {
       return null;
     }
     const growChance =
@@ -57,7 +57,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       return null;
     }
     const emptyNeighbors = plot.neighbors.filter(
-      (j) => testField[j].icon == ""
+      (j) => testField[j].icon == Emoji.Empty
     );
     if (emptyNeighbors.length == 0) {
       return null;
@@ -73,7 +73,9 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       if (growInto === null) {
         continue;
       }
-      appendLog(`Growing 🎃 at ${String(growInto)} (from ${String(i)}).`);
+      appendLog(
+        `Growing ${Emoji.Pumpkin} at ${String(growInto)} (from ${String(i)}).`
+      );
       nextField = prevField.map((prevPlot, j) => {
         const newPlot = { ...prevPlot };
         newPlot.children = [...prevPlot.children];
@@ -81,7 +83,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
         if (j == i) {
           newPlot.children.push(growInto);
         } else if (j == growInto) {
-          newPlot.icon = "🎃";
+          newPlot.icon = Emoji.Pumpkin;
           newPlot.stem = i;
         }
         return newPlot;
@@ -99,9 +101,9 @@ export function Field({ appendLog, clearLog }: fieldProps) {
 
   function fullyGrown(testField: Plot[]) {
     for (const plot of testField) {
-      if (plot.icon == "🌱") {
+      if (plot.icon == Emoji.Sprout) {
         for (const n of plot.neighbors) {
-          if (testField[n].icon == "") {
+          if (testField[n].icon == Emoji.Empty) {
             return false;
           }
         }
@@ -126,7 +128,7 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       appendLog("Timed out after 1000 steps.");
     } else {
       appendLog(`Done growing after ${String(t)} steps.`);
-      appendLog(`Score: ${scoreField(testField).summary}.`)
+      appendLog(`Score: ${scoreField(testField).summary}.`);
     }
   }
 
@@ -148,29 +150,29 @@ export function Field({ appendLog, clearLog }: fieldProps) {
       <div className="fieldContainer">
         <div className="field">
           {field.map((plot) => (
-            <FieldPlot onClick={handlePlotClick} plot={plot} key={plot.i} debug={false} />
+            <FieldPlot
+              onClick={handlePlotClick}
+              plot={plot}
+              key={plot.i}
+              debug={false}
+            />
           ))}
         </div>
         <div className="buttonBar">
           <div>
             <button onClick={handleIterate}>Iterate</button>
             <button onClick={handleIterateUntilFull}>Until fully grown</button>
-            {fullyGrown(field) ? "⭐" : ""}
+            {fullyGrown(field) ? Emoji.Star : ""}
           </div>
-          <button
-            onClick={(e) => {
-              handleClear(e, "🎃");
-            }}
-          >
-            Clear 🎃
-          </button>
-          <button
-            onClick={(e) => {
-              handleClear(e, "🌱");
-            }}
-          >
-            Clear 🌱
-          </button>
+          {[Emoji.Pumpkin, Emoji.Sprout].map((emoji) => (
+            <button
+              onClick={(e) => {
+                handleClear(e, emoji);
+              }}
+            >
+              Clear {emoji}
+            </button>
+          ))}
           <button onClick={handleClear}>Clear log</button>
         </div>
       </div>
