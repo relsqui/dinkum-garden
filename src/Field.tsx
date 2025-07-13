@@ -1,11 +1,14 @@
 import { FieldPlot } from "./Plot";
 import { type Plot } from "./plot";
+import type { Settings } from "./settings";
 
 export function Field({
   field,
+  settings,
   handlePlotClick,
 }: {
   field: Plot[];
+  settings: Settings;
   handlePlotClick: (e: React.MouseEvent, plot: Plot) => void;
 }) {
   return (
@@ -17,7 +20,8 @@ export function Field({
               onClick={handlePlotClick}
               plot={plot}
               key={plot.i}
-              debug={false}
+              field={field}
+              settings={settings}
             />
           ))}
         </div>

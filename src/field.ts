@@ -8,7 +8,9 @@ import {
   maxAge,
   canHarvest,
   canGrow,
+  getEmptyNeighbors,
 } from "./plot";
+import type { Settings } from "./settings";
 
 export function getEmptyField() {
   const field: Plot[] = [];
@@ -27,25 +29,23 @@ export function copyField(field: Plot[]) {
   return field.map((plot) => copyPlot(plot));
 }
 
-function getGrowDestination(field: Plot[], i: number): number | null {
+function getGrowDestination(field: Plot[], i: number, settings: Settings): number | null {
   const plot = field[i];
   if (plot.state != PlotState.Sprout) return null;
   if (plot.age < maxAge[plot.state]) return null;
   const growChance = plot.children.length == 0 ? 1 : 0.1 / plot.children.length;
   if (Math.random() > growChance) return null;
-  const emptyNeighbors = plot.neighbors.filter(
-    (j) => field[j].state == PlotState.Empty
-  );
+  const emptyNeighbors = getEmptyNeighbors(plot, field, settings);
   if (emptyNeighbors.length == 0) return null;
   return emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
 }
 
-export function iterate(field: Plot[]): [Plot[], number] {
+export function iterate(field: Plot[], settings: Settings): [Plot[], number] {
   const nextField = copyField(field);
   let newGrowth = 0;
   for (const plot of nextField) {
     const nextPlot = copyPlot(plot);
-    const growDestination = getGrowDestination(nextField, nextPlot.i);
+    const growDestination = getGrowDestination(nextField, nextPlot.i, settings);
     if (growDestination !== null) {
       const child = copyPlot(nextField[growDestination]);
       nextPlot.children.push(child.i);

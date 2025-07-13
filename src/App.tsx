@@ -34,7 +34,7 @@ function App() {
     let newHarvests;
     let d = 1;
     for (; d <= iterationDays; d++) {
-      [nextField, newGrowth] = iterate(nextField);
+      [nextField, newGrowth] = iterate(nextField, settings);
       if (settings.autoHarvest) {
         [nextField, newHarvests] = harvestAll(nextField);
       }
@@ -115,7 +115,7 @@ function App() {
           handleReset,
         }}
       />
-      <Field field={field} handlePlotClick={handlePlotClick} />
+      <Field {...{ field, settings, handlePlotClick }} />
       <Log logContents={logContents} />
     </>
   );

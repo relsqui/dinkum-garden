@@ -33,22 +33,17 @@ div .sidebar {
   padding: 0.5em 1em;
 }
 
-div .buttonBar {
+div .buttonPane {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
 div .stats {
   display: flex;
   flex-direction: column;
-}
-
-div .autoHarvest {
-  display: flex;
-  align-items: center;
-  justify-content: baseline;
+  align-items: flex-start;
 }
 
 div .log {
@@ -90,6 +85,9 @@ div .plotInfo {
   position: absolute;
   top: 5px;
   left: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 div .plotAge {
@@ -118,9 +116,28 @@ div .stemUp {
   height: 100px;
 }
 
+div .stemWrapUp {
+  inset-block-start: -3px;
+  height: 45px;
+}
+
+div .stemFragmentDown {
+  inset-block-start: 470px;
+  height: 38px;
+}
+
 div .stemDown {
   inset-block-start: 50px;
   height: 100px;
+}
+
+div .stemWrapDown {
+  height: 40px;
+}
+
+div .stemFragmentUp {
+  inset-block-start: -415px;
+  height: 40px;
 }
 
 div .stemLeft {
@@ -128,9 +145,29 @@ div .stemLeft {
   width: 100px;
 }
 
+div .stemWrapLeft {
+  inset-inline-start: 0;
+  width: 40px;
+}
+
+div .stemFragmentRight {
+  inset-inline-start: 460px;
+  width: 50px;
+}
+
 div .stemRight {
   inset-inline-start: 50px;
   width: 100px;
+}
+
+div .stemWrapRight {
+  inset-inline-start: 50px;
+  width: 50px;
+}
+
+div .stemFragmentLeft {
+  inset-inline-start: -410px;
+  width: 50px;
 }
 
 a {
@@ -170,6 +207,6 @@ input {
   margin: 0.5em;
 }
 
-input[type=text] {
+input[type=number] {
   height: 2.5em;
 }

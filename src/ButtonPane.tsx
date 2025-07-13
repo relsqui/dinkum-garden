@@ -2,6 +2,34 @@ import { useState, type MouseEvent } from "react";
 import { PlotState, type StateString } from "./plot";
 import type { SettingName, Settings } from "./settings";
 
+function SettingCheckbox({
+  label,
+  description,
+  settings,
+  updateSetting,
+}: {
+  label: SettingName;
+  description: string;
+  settings: Settings;
+  updateSetting: (setting: SettingName, value: boolean) => void;
+}) {
+  return (
+    <>
+      <input
+        type="checkbox"
+        name={label}
+        id={label}
+        defaultChecked={settings[label]}
+        value={String(settings[label])}
+        onChange={(e) => {
+          updateSetting(label, e.target.checked);
+        }}
+      />
+      <label htmlFor={label}>{description}</label>
+    </>
+  );
+}
+
 export function ButtonPane({
   settings,
   updateSetting,
@@ -18,8 +46,13 @@ export function ButtonPane({
   handleReset: (event: MouseEvent, state?: StateString) => void;
 }) {
   const [iterationDays, setIterationDays] = useState(1);
+  const checkboxes: [SettingName, string][] = [
+    ["autoHarvest", `Harvest full-grown ${PlotState.Pumpkin}`],
+    ["wrapWE", "Wrap field left-to-right"],
+    ["wrapNS", "Wrap field up-to-down"],
+  ];
   return (
-    <div className="sidebar buttonBar">
+    <div className="sidebar buttonPane">
       <div className="stats">
         <div>Day: {day}</div>
         <div>Harvests: {harvests}</div>
@@ -46,17 +79,15 @@ export function ButtonPane({
           />{" "}
           days
         </div>
-        <div className="autoHarvest">
-          <input
-            type="checkbox"
-            name="autoHarvest"
-            value={String(settings.autoHarvest)}
-            onChange={(e) => {
-              updateSetting("autoHarvest", e.target.checked);
-            }}
-          />{" "}
-          Harvest full-grown {PlotState.Pumpkin}
-        </div>
+        {checkboxes.map(([label, description]) => {
+          return (
+            <div key={label}>
+              <SettingCheckbox
+                {...{ label, description, settings, updateSetting }}
+              />
+            </div>
+          );
+        })}
       </div>
       <div>
         <button
@@ -67,6 +98,18 @@ export function ButtonPane({
         >
           Reset
         </button>
+        {import.meta.env.MODE == "development" ? (
+          <SettingCheckbox
+            {...{
+              label: "debug",
+              description: "Debug view",
+              settings,
+              updateSetting,
+            }}
+          />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

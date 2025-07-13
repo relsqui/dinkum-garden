@@ -1,13 +1,16 @@
-import { getInfo, stemClasses, type Plot } from "./plot";
+import { Emoji, getInfo, maxAge, stemClasses, stemFragment, type Plot } from "./plot";
+import type { Settings } from "./settings";
 
 export function FieldPlot({
   onClick,
   plot,
-  debug,
+  field,
+  settings,
 }: {
   onClick: (e: React.MouseEvent, plot: Plot) => void;
   plot: Plot;
-  debug: boolean;
+  field: Plot[];
+  settings: Settings;
 }) {
   return (
     <div
@@ -16,13 +19,27 @@ export function FieldPlot({
         onClick(e, plot);
       }}
     >
-      <div className="plotInfo">{getInfo(plot, debug)}</div>
-      <div className="plotAge">{plot.age ? plot.age : ""}</div>
+      <div className="plotInfo">
+        {getInfo(plot, field, settings).map((info, i) => (
+          <div key={i}>{info}</div>
+        ))}
+      </div>
+      <div className="plotAge">
+        {plot.age
+          ? plot.age == maxAge[plot.state]
+            ? Emoji.Star
+            : plot.age
+          : ""}
+      </div>
       <div className="plotState">{plot.state}</div>
       {plot.stem === null ? (
         ""
       ) : (
-        <div className={stemClasses[plot.i - plot.stem]} />
+        <>
+          <div className={stemClasses[plot.i - plot.stem]} />
+          {/* TODO: this in some less hacky way */}
+          <div className={stemFragment[plot.i - plot.stem]} />
+        </>
       )}
     </div>
   );
