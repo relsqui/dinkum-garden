@@ -17,6 +17,7 @@ export function FieldPlot({
       }}
     >
       <div className="plotInfo">{getInfo(plot, debug)}</div>
+      <div className="plotAge">{plot.age ? plot.age : ""}</div>
       <div className="plotState">{plot.state}</div>
       {plot.stem === null ? (
         ""

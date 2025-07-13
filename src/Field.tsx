@@ -1,5 +1,5 @@
 import { FieldPlot } from "./Plot";
-import { PlotState, type StateString, type Plot, Emoji } from "./plot";
+import { PlotState, type StateString, type Plot, Emoji, maxAge, isCropState } from "./plot";
 import {
   addPlot,
   fullyGrown,
@@ -7,33 +7,37 @@ import {
   iterate,
   iterateUntil,
   removePlot,
-  scoreField,
+  // scoreField,
 } from "./field";
 import { useState } from "react";
 
 export function Field({
-  appendLog,
+  log,
   clearLog,
 }: {
-  appendLog: (message: string) => void;
+  log: (message: string) => void;
   clearLog: () => void;
 }) {
   const [field, setField] = useState(getEmptyField);
+  const [harvest, setHarvest] = useState(0);
 
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
     e.stopPropagation();
     let nextField;
     if (plot.state == PlotState.Water) {
-      appendLog("Can't plant over the sprinkler.");
+      log("Can't plant over the sprinkler.");
     } else if (plot.state == PlotState.Empty) {
-      appendLog(`Adding ${PlotState.Sprout} at ${String(plot.i)}.`);
+      log(`Adding ${PlotState.Sprout} at ${String(plot.i)}.`);
       nextField = addPlot(field, plot.i, PlotState.Sprout);
-    } else if (
-      ([PlotState.Sprout, PlotState.Pumpkin] as StateString[]).includes(
-        plot.state
-      )
-    ) {
-      appendLog(`Removing ${plot.state} at ${String(plot.i)}.`);
+    } else if (isCropState(plot.state)) {
+      if (plot.state == PlotState.Sprout) {
+        log(`Removing ${plot.state} at ${String(plot.i)}.`);
+      } else if (plot.age == maxAge[plot.state]) {
+        log(`Harvesting ${plot.state} at ${String(plot.i)}.`);
+        setHarvest(harvest + 1);
+      } else {
+        log(`Removing partly-grown ${plot.state} at ${String(plot.i)}.`);
+      }
       nextField = removePlot(field, plot.i);
     }
     if (nextField) {
@@ -43,23 +47,23 @@ export function Field({
 
   function handleIterate(e: React.MouseEvent) {
     e.stopPropagation();
-    appendLog("Iterating ...");
+    log("Iterating ...");
     const [nextField, logMessages] = iterate(field);
-    logMessages.map(appendLog);
+    logMessages.map(log);
     setField(nextField);
   }
 
   function handleIterateUntilGrown(e: React.MouseEvent) {
     e.stopPropagation();
-    appendLog("Iterating until fully grown ...");
+    log("Iterating until fully grown ...");
     const [nextField, logMessages, steps] = iterateUntil(field, fullyGrown);
     if (steps == 1000) {
       logMessages.push("Timed out after 1000 steps.");
     } else {
       logMessages.push(`Done growing after ${String(steps)} steps.`);
-      logMessages.push(`Score: ${scoreField(nextField).summary}.`);
+      // logMessages.push(`Score: ${scoreField(nextField).summary}.`);
     }
-    logMessages.map(appendLog);
+    logMessages.map(log);
     setField(nextField);
   }
 
@@ -85,7 +89,7 @@ export function Field({
               onClick={handlePlotClick}
               plot={plot}
               key={plot.i}
-              debug={true}
+              debug={false}
             />
           ))}
         </div>

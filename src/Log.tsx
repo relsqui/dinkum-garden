@@ -1,11 +1,8 @@
-export interface LogLine {
-  message: string;
-  count: number;
-}
+import type { LogLine } from "./log";
 
 export function Log({ logContents }: { logContents: LogLine[] }) {
   return (
-    <div className="log">
+    <div className="log sidebar">
       <div>
         {logContents.map((logLine, i) => (
           <div className="logLine" key={i}>

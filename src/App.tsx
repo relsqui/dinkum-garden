@@ -1,40 +1,24 @@
 import { useState } from "react";
 import { Field } from "./Field";
-import { Log, type LogLine } from "./Log";
+import { Log } from "./Log";
+import { StatusPane } from "./StatusPane";
+import { appendLog, type LogLine } from "./log";
 
 function App() {
   const [logContents, setLogContents] = useState<LogLine[]>([]);
 
-  function appendLog(message: string) {
-    setLogContents((prevLogContents) => {
-      if (prevLogContents.length == 0) {
-        return [{ message, count: 1 }];
-      } else {
-        // Even though we're slicing, we still need to make a copy to avoid our
-        // slice containing a reference to the original count value.
-        const lastLog = { ...prevLogContents.slice(-1)[0] };
-        if (message == lastLog.message) {
-          lastLog.count++;
-          return [...prevLogContents.slice(0, -1), lastLog];
-        } else {
-          return [...prevLogContents, { message, count: 1 }];
-        }
-      }
-    });
-  }
-
-  function clearLog() {
-    setLogContents([{ message: "Cleared.", count: 1 }]);
-  }
-
-  const fieldProps = {
-    appendLog,
-    clearLog,
-  };
-
   return (
     <>
-      <Field {...fieldProps} />
+      <StatusPane />
+      <Field
+        log={
+          // The setter needs to be a function so it handles multiple log
+          // messages in one render properly.
+          (message: string) =>
+            setLogContents((logContents) => appendLog(message, logContents))
+        }
+        clearLog={() => setLogContents([])}
+      />
       <Log logContents={logContents} />
     </>
   );

@@ -26,6 +26,7 @@ export type StateString = typeof PlotState[keyof typeof PlotState]
 export const maxAge = {
   [Emoji.Sprout]: 11,
   [Emoji.Pumpkin]: 7,
+  [Emoji.Melon]: 7,
 }
 
 export interface Plot {
@@ -82,7 +83,7 @@ stemClasses[1] = "stem stemLeft";
 export function getInfo(plot: Plot, debug: boolean) {
   const info: (string | number)[] = [plot.i];
   if (debug && import.meta.env.MODE != "production") {
-    info.push(plot.age, String(plot.children));
+    info.push(plot.children.length);
   }
   return info.map(String).join(" / ");
 }

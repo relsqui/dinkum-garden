@@ -21,6 +21,18 @@
   --stem-color: #70ce60;
 }
 
+div .sidebar {
+  margin: 0 2em;
+  padding: 0 1em;
+  display: flex;
+  min-width: 300px;
+  height: 500px;
+  overflow: auto;
+  background-color: rgba(12, 0, 46, 0.1);
+  border-radius: 1em;
+  padding: 0.5em 1em;
+}
+
 div .fieldContainer {
   display: flex;
   flex-direction: column;
@@ -46,11 +58,20 @@ div .plot {
 }
 
 div .plotInfo {
-  color: white;
+  color: rgb(165, 161, 250);
   font-size: small;
   position: absolute;
   top: 5px;
   left: 5px;
+}
+
+div .plotAge {
+  color: rgb(229, 228, 228);
+  font-size: small;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-weight: 600;
 }
 
 div .plotState {
@@ -89,16 +110,8 @@ div .stemRight {
 }
 
 div .log {
-  margin: 0 2em;
-  padding: 0 1em;
   display: flex;
   flex-direction: column-reverse;
-  min-width: 500px;
-  height: 500px;
-  overflow: auto;
-  background-color: rgba(12, 0, 46, 0.1);
-  border-radius: 1em;
-  padding: 0.5em 1em;
 }
 
 div .logLine {
