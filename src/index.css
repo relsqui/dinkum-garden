@@ -16,8 +16,8 @@
 }
 
 :root {
-  color: rgb(226, 226, 242);
-  background-color: #4e3a14;
+  color: rgb(215, 201, 201);
+  background-color: rgb(29, 86, 29);
   --stem-color: #70ce60;
 }
 
@@ -65,10 +65,9 @@ div .field {
 }
 
 div .plot {
-  background-color: darkgreen;
+  background-color: #4e3314;
   aspect-ratio: 1;
   min-width: 100px;
-  /* shoutout to http://howtocenterincss.com/ */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,9 +93,6 @@ div .plotAge {
 
 div .plotState {
   z-index: 10;
-  /* shoutout to https://codepen.io/bramus/pen/gwvOLY */
-  text-shadow: 1px 1px 0 var(--stem-color), -1px 1px 0 var(--stem-color), 1px -1px 0 var(--stem-color),
-    -1px -1px 0 var(--stem-color);
 }
 
 div .stem {
