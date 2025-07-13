@@ -150,3 +150,26 @@ export function addPlot(field: Plot[], i: number, state: StateString) {
   }
   return nextField;
 }
+
+export function togglePlot(plot: Plot, field: Plot[]): [Plot[], string[]] {
+  let nextField = copyField(field);
+  let logMessages = [];
+  if (plot.state == PlotState.Water) {
+    logMessages.push("Can't plant over the sprinkler.");
+  } else if (plot.state == PlotState.Empty) {
+    logMessages.push(`Adding ${PlotState.Sprout} at ${String(plot.i)}.`);
+    nextField = addPlot(field, plot.i, PlotState.Sprout);
+  } else if (isCropState(plot.state)) {
+    if (plot.state == PlotState.Sprout) {
+      logMessages.push(`Removing ${plot.state} at ${String(plot.i)}.`);
+    } else if (plot.age == maxAge[plot.state]) {
+      logMessages.push(`Harvesting ${plot.state} at ${String(plot.i)}.`);
+    } else {
+      logMessages.push(
+        `Removing partly-grown ${plot.state} at ${String(plot.i)}.`
+      );
+    }
+    nextField = removePlot(field, plot.i);
+  }
+  return [nextField, logMessages];
+}
