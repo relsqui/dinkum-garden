@@ -81,25 +81,6 @@ export function iterate(field: Plot[]): [Plot[], string[]] {
   return [nextField, logMessages];
 }
 
-export function iterateUntil(
-  field: Plot[],
-  doneIterating: (field: Plot[], t: number) => boolean,
-  maxSteps = 1000
-): [Plot[], string[], number] {
-  let t = 0;
-  let testField = copyField(field);
-  const logMessages = [];
-  let newMessages;
-  for (t = 0; t < maxSteps; t++) {
-    [testField, newMessages] = iterate(testField);
-    logMessages.push(...newMessages);
-    if (doneIterating(testField, t)) {
-      break;
-    }
-  }
-  return [testField, logMessages, t];
-}
-
 export function removePlot(field: Plot[], i: number) {
   const nextField = copyField(field);
   const plot = nextField[i];

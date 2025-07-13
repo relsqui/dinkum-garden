@@ -1,16 +1,9 @@
 import { useState } from "react";
 import { Field } from "./Field";
 import { Log } from "./Log";
-import { StatusPane } from "./StatusPane";
+import { ButtonPane } from "./ButtonPane";
 import { appendLog, type LogLine } from "./log";
-import {
-  isFullyGrown,
-  getEmptyField,
-  iterate,
-  iterateUntil,
-  removePlot,
-  togglePlot,
-} from "./field";
+import { getEmptyField, iterate, removePlot, togglePlot } from "./field";
 import { isHarvestable, type Plot, type StateString } from "./plot";
 
 function App() {
@@ -24,23 +17,18 @@ function App() {
     setLogContents((prevLogContents) => appendLog(message, prevLogContents));
   }
 
-  function handleIterate(e: React.MouseEvent) {
+  function handleIterate(e: React.MouseEvent, days: number = 1) {
     e.stopPropagation();
     log("Iterating ...");
-    const [nextField, logMessages] = iterate(field);
-    logMessages.map(log);
-    setField(nextField);
-  }
-
-  function handleIterateUntilGrown(e: React.MouseEvent) {
-    e.stopPropagation();
-    log("Iterating until fully grown ...");
-    const [nextField, logMessages, steps] = iterateUntil(field, isFullyGrown);
-    if (steps == 1000) {
-      logMessages.push("Timed out after 1000 steps.");
-    } else {
-      logMessages.push(`Done growing after ${String(steps)} steps.`);
+    let nextField = field;
+    const logMessages = [];
+    let newMessages;
+    let d = 0;
+    for (; d < days; d++) {
+      [nextField, newMessages] = iterate(nextField);
+      logMessages.push(...newMessages);
     }
+    logMessages.push(`Iterated for ${d} days.`);
     logMessages.map(log);
     setField(nextField);
   }
@@ -72,11 +60,10 @@ function App() {
 
   return (
     <>
-      <StatusPane
+      <ButtonPane
         {...{
           harvest,
           handleIterate,
-          handleIterateUntilGrown,
           handleClear,
         }}
       />

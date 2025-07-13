@@ -158,3 +158,9 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+select {
+  height: 2.5em;
+  font: inherit;
+  margin: 0.5em;
+}
