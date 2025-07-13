@@ -3,12 +3,19 @@ import { Field } from "./Field";
 import { Log } from "./Log";
 import { ButtonPane } from "./ButtonPane";
 import { appendLog, type LogLine } from "./log";
-import { getEmptyField, iterate, removePlot, togglePlot } from "./field";
-import { isHarvestable, type Plot, type StateString } from "./plot";
+import { getEmptyField, harvestAll, iterate, togglePlot } from "./field";
+import {
+  canHarvest,
+  copyPlot,
+  getEmptyPlot,
+  PlotState,
+  type Plot,
+} from "./plot";
 
 function App() {
   const [field, setField] = useState(getEmptyField);
-  const [harvest, setHarvest] = useState(0);
+  const [harvests, setHarvests] = useState(0);
+  const [day, setDay] = useState(1);
   const [logContents, setLogContents] = useState<LogLine[]>([]);
 
   function log(message: string) {
@@ -17,33 +24,58 @@ function App() {
     setLogContents((prevLogContents) => appendLog(message, prevLogContents));
   }
 
-  function handleIterate(e: React.MouseEvent, days: number = 1) {
+  function handleIterate(e: React.MouseEvent, iterationDays = 1) {
     e.stopPropagation();
-    log("Iterating ...");
     let nextField = field;
+    let nextHarvests = harvests;
     const logMessages = [];
-    let newMessages;
-    let d = 0;
-    for (; d < days; d++) {
-      [nextField, newMessages] = iterate(nextField);
-      logMessages.push(...newMessages);
+    let newGrowth;
+    let newHarvests;
+    let d = 1;
+    for (; d <= iterationDays; d++) {
+      [nextField, newGrowth] = iterate(nextField);
+      [nextField, newHarvests] = harvestAll(nextField);
+      const logParts = [];
+      if (newGrowth) logParts.push(`grew ${newGrowth}`);
+      if (newHarvests) {
+        logParts.push(`harvested ${newHarvests}`);
+        nextHarvests += newHarvests;
+      }
+      if (logParts.length) {
+        let summary = logParts.join(", ");
+        summary = summary[0].toUpperCase() + summary.slice(1);
+        logMessages.push(`Day ${day + d}: ${summary} ${PlotState.Pumpkin}.`);
+      }
     }
-    logMessages.push(`Iterated for ${d} days.`);
     logMessages.map(log);
     setField(nextField);
+    setHarvests(nextHarvests);
+    setDay(day + iterationDays);
   }
 
-  function handleClear(e: React.MouseEvent, state: StateString | null = null) {
+  function handleReset(e: React.MouseEvent) {
     e.stopPropagation();
-    if (state === null) {
-      setLogContents([]);
-      setHarvest(0);
+    setLogContents([]);
+    setHarvests(0);
+    setDay(1);
+    // If the field was already reset to newly-planted sprouts,
+    // resetting again removes those sprouts.
+    let doubleReset = true;
+    const nextField = field.map((plot) => {
+      if ([PlotState.Pumpkin, PlotState.Melon].includes(plot.state)) {
+        doubleReset = false;
+        return getEmptyPlot(plot.x, plot.y);
+      }
+      const nextPlot = copyPlot(plot);
+      if (plot.state == PlotState.Sprout && plot.age > 1) {
+        doubleReset = false;
+        nextPlot.age = 1;
+      }
+      return nextPlot;
+    });
+    if (doubleReset) {
       setField(getEmptyField);
     } else {
-      let nextField = field;
-      for (const plot of field.filter((plot) => plot.state == state)) {
-        nextField = removePlot(nextField, plot.i);
-      }
       setField(nextField);
     }
   }
@@ -51,10 +83,10 @@ function App() {
   function handlePlotClick(e: React.MouseEvent, plot: Plot) {
     e.stopPropagation();
     const [nextField, logMessages] = togglePlot(plot, field);
-    if (isHarvestable(plot)) {
-      setHarvest(harvest + 1);
+    if (canHarvest(plot)) {
+      setHarvests(harvests + 1);
     }
-    logMessages.map(log);
+    logMessages.map((message) => log(`Day ${day}: ${message}`));
     setField(nextField);
   }
 
@@ -62,9 +94,10 @@ function App() {
     <>
       <ButtonPane
         {...{
-          harvest,
+          day: day,
+          harvests,
           handleIterate,
-          handleClear,
+          handleReset,
         }}
       />
       <Field field={field} handlePlotClick={handlePlotClick} />

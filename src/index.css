@@ -147,7 +147,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #e3e9de;
+  background-color: rgb(227, 233, 222, 0.9);
   color: #332d36;
   font-weight: 600;
 }
@@ -159,7 +159,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-select {
+input {
   height: 2.5em;
   font: inherit;
   margin: 0.5em;

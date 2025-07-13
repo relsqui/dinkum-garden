@@ -6,6 +6,8 @@ import {
   type StateString,
   isCropState,
   maxAge,
+  canHarvest,
+  canGrow,
 } from "./plot";
 
 export function getEmptyField() {
@@ -21,21 +23,8 @@ export function getEmptyField() {
   return field;
 }
 
-function copyField(field: Plot[]) {
+export function copyField(field: Plot[]) {
   return field.map((plot) => copyPlot(plot));
-}
-
-export function isFullyGrown(field: Plot[]) {
-  for (const plot of field) {
-    if (plot.state == PlotState.Sprout) {
-      for (const n of plot.neighbors) {
-        if (field[n].state == PlotState.Empty) {
-          return false;
-        }
-      }
-    }
-  }
-  return true;
 }
 
 function getGrowDestination(field: Plot[], i: number): number | null {
@@ -51,14 +40,9 @@ function getGrowDestination(field: Plot[], i: number): number | null {
   return emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
 }
 
-function getGrowMessage(plot: Plot) {
-  const [i, stem] = [plot.i, plot.stem].map(String);
-  return `Growing ${plot.state} at ${i} (from ${stem}).`;
-}
-
-export function iterate(field: Plot[]): [Plot[], string[]] {
-  const logMessages = [];
+export function iterate(field: Plot[]): [Plot[], number] {
   const nextField = copyField(field);
+  let newGrowth = 0;
   for (const plot of nextField) {
     const nextPlot = copyPlot(plot);
     const growDestination = getGrowDestination(nextField, nextPlot.i);
@@ -69,16 +53,13 @@ export function iterate(field: Plot[]): [Plot[], string[]] {
       child.stem = nextPlot.i;
       child.age = 1;
       nextField[child.i] = child;
-      logMessages.push(getGrowMessage(nextField[child.i]));
-    } else if (
-      isCropState(nextPlot.state) &&
-      nextPlot.age < maxAge[nextPlot.state]
-    ) {
+      newGrowth++;
+    } else if (canGrow(nextPlot)) {
       nextPlot.age++;
     }
     nextField[nextPlot.i] = nextPlot;
   }
-  return [nextField, logMessages];
+  return [nextField, newGrowth];
 }
 
 export function removePlot(field: Plot[], i: number) {
@@ -115,19 +96,31 @@ export function togglePlot(plot: Plot, field: Plot[]): [Plot[], string[]] {
   if (plot.state == PlotState.Water) {
     logMessages.push("Can't plant over the sprinkler.");
   } else if (plot.state == PlotState.Empty) {
-    logMessages.push(`Adding ${PlotState.Sprout} at ${String(plot.i)}.`);
+    logMessages.push(`Adding ${PlotState.Sprout}.`);
     nextField = addPlot(field, plot.i, PlotState.Sprout);
   } else if (isCropState(plot.state)) {
     if (plot.state == PlotState.Sprout) {
-      logMessages.push(`Removing ${plot.state} at ${String(plot.i)}.`);
-    } else if (plot.age == maxAge[plot.state]) {
-      logMessages.push(`Harvesting ${plot.state} at ${String(plot.i)}.`);
+      logMessages.push(`Removing ${plot.state}.`);
+    } else if (canHarvest(plot)) {
+      logMessages.push(`Harvesting ${plot.state}.`);
     } else {
       logMessages.push(
-        `Removing partly-grown ${plot.state} at ${String(plot.i)}.`
+        `Removing partly-grown ${plot.state}.`
       );
     }
     nextField = removePlot(field, plot.i);
   }
   return [nextField, logMessages];
+}
+
+export function harvestAll(field: Plot[]): [Plot[], number] {
+  let harvests = 0;
+  let nextField = field;
+  for (const plot of nextField) {
+    if (canHarvest(plot)) {
+      nextField = removePlot(nextField, plot.i);
+      harvests++;
+    }
+  }
+  return [nextField, harvests];
 }

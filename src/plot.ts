@@ -73,11 +73,15 @@ export function isCropState(state: StateString) {
   return [PlotState.Pumpkin, PlotState.Melon, PlotState.Sprout].includes(state);
 }
 
-export function isHarvestable(plot: Plot) {
+export function canHarvest(plot: Plot) {
   return (
     [PlotState.Pumpkin, PlotState.Melon].includes(plot.state) &&
     plot.age == maxAge[plot.state]
   );
+}
+
+export function canGrow(plot: Plot) {
+  return isCropState(plot.state) && plot.age < maxAge[plot.state];
 }
 
 // The keys here are the diff between the stem index and gourd index.

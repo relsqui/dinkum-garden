@@ -1,42 +1,52 @@
 import { useState, type MouseEvent } from "react";
-import { PlotState, type StateString } from "./plot";
+import { type StateString } from "./plot";
 
 export function ButtonPane({
-  harvest,
+  day,
+  harvests,
   handleIterate,
-  handleClear,
+  handleReset,
 }: {
-  harvest: number;
+  day: number;
+  harvests: number;
   handleIterate: (event: MouseEvent, days?: number) => void;
-  handleClear: (event: MouseEvent, state?: StateString) => void;
+  handleReset: (event: MouseEvent, state?: StateString) => void;
 }) {
-  const [days, setDays] = useState(1);
+  const [iterationDays, setIterationDays] = useState(1);
   return (
     <div className="sidebar buttonBar">
-      <div>Harvest: {harvest}</div>
+      <div>Day: {day}</div>
+      <div>Harvests: {harvests}</div>
       <div>
-        <button onClick={(e) => handleIterate(e, days)}>Iterate</button>
-        <select
-          name="days"
-          value={days}
-          onChange={(e) => setDays(Number(e.target.value))}
+        <button
+          onClick={(e) => {
+            handleIterate(e, iterationDays);
+          }}
         >
-          {[...Array(56).keys()].map((n) => {
-            n++; // 1-based instead of 0-based
-            return <option value={n}>{n}</option>;
-          })}
-        </select>{" "}
+          Iterate
+        </button>
+        <input
+          name="days"
+          type="number"
+          size={2}
+          min="1"
+          max="1000"
+          value={iterationDays}
+          onChange={(e) => {
+            setIterationDays(Number(e.target.value));
+          }}
+        />{" "}
         days
       </div>
       <div>
         <button
           onClick={(e) => {
-            handleClear(e, PlotState.Pumpkin);
+            setIterationDays(1);
+            handleReset(e);
           }}
         >
-          Clear {PlotState.Pumpkin}
+          Reset
         </button>
-        <button onClick={handleClear}>Reset</button>
       </div>
     </div>
   );
