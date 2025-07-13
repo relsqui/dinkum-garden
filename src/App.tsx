@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Field } from "./Field";
-import { Log } from "./Log";
 import { ButtonPane } from "./ButtonPane";
-import { appendLog, type LogLine } from "./log";
+import { Field } from "./Field";
 import { getEmptyField, harvestAll, iterate, togglePlot } from "./field";
 import { canHarvest, getEmptyPlot, PlotState, type Plot } from "./plot";
+import { Log } from "./Log";
+import { appendLog, type LogLine } from "./log";
 
 function App() {
   const [field, setField] = useState(getEmptyField);
@@ -30,15 +30,17 @@ function App() {
       [nextField, newGrowth] = iterate(nextField);
       [nextField, newHarvests] = harvestAll(nextField);
       const logParts = [];
-      if (newGrowth) logParts.push(`grew ${newGrowth}`);
+      if (newGrowth) logParts.push(`grew ${String(newGrowth)}`);
       if (newHarvests) {
-        logParts.push(`harvested ${newHarvests}`);
+        logParts.push(`harvested ${String(newHarvests)}`);
         nextHarvests += newHarvests;
       }
       if (logParts.length) {
         let summary = logParts.join(", ");
         summary = summary[0].toUpperCase() + summary.slice(1);
-        logMessages.push(`Day ${day + d}: ${summary} ${PlotState.Pumpkin}.`);
+        logMessages.push(
+          `Day ${String(day + d)}: ${summary} ${PlotState.Pumpkin}.`
+        );
       }
     }
     logMessages.map(log);
@@ -71,6 +73,8 @@ function App() {
       }
       return nextPlot;
     });
+    // Uhhh eslint you're just wrong about this one.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (doubleReset) {
       setField(getEmptyField);
     } else {
@@ -84,7 +88,9 @@ function App() {
     if (canHarvest(plot)) {
       setHarvests(harvests + 1);
     }
-    logMessages.map((message) => log(`Day ${day}: ${message}`));
+    logMessages.map((message) => {
+      log(`Day ${String(day)}: ${message}`);
+    });
     setField(nextField);
   }
 
