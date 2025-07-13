@@ -4,7 +4,7 @@ import { Log } from "./Log";
 import { StatusPane } from "./StatusPane";
 import { appendLog, type LogLine } from "./log";
 import {
-  fullyGrown,
+  isFullyGrown,
   getEmptyField,
   iterate,
   iterateUntil,
@@ -35,7 +35,7 @@ function App() {
   function handleIterateUntilGrown(e: React.MouseEvent) {
     e.stopPropagation();
     log("Iterating until fully grown ...");
-    const [nextField, logMessages, steps] = iterateUntil(field, fullyGrown);
+    const [nextField, logMessages, steps] = iterateUntil(field, isFullyGrown);
     if (steps == 1000) {
       logMessages.push("Timed out after 1000 steps.");
     } else {
@@ -49,6 +49,8 @@ function App() {
     e.stopPropagation();
     if (state === null) {
       setLogContents([]);
+      setHarvest(0);
+      setField(getEmptyField);
     } else {
       let nextField = field;
       for (const plot of field.filter((plot) => plot.state == state)) {

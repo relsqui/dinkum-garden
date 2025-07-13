@@ -25,30 +25,7 @@ function copyField(field: Plot[]) {
   return field.map((plot) => copyPlot(plot));
 }
 
-export function scoreField(field: Plot[]) {
-  // These values are for pumpkins
-  const gourdPrice = 3120;
-  const seedPrice = 780;
-  const seeds = field.filter((plot) => plot.state == PlotState.Sprout).length;
-  const gourds = field.filter((plot) => plot.state == PlotState.Pumpkin).length;
-  const score = gourds * gourdPrice - seeds * seedPrice;
-  const summary = [
-    score,
-    "points for",
-    gourds,
-    "gourds from",
-    seeds,
-    "seeds",
-  ].join(" ");
-  return {
-    seeds,
-    gourd: gourds,
-    score,
-    summary,
-  };
-}
-
-export function fullyGrown(field: Plot[]) {
+export function isFullyGrown(field: Plot[]) {
   for (const plot of field) {
     if (plot.state == PlotState.Sprout) {
       for (const n of plot.neighbors) {
@@ -74,7 +51,7 @@ function getGrowDestination(field: Plot[], i: number): number | null {
   return emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
 }
 
-function growMessage(plot: Plot) {
+function getGrowMessage(plot: Plot) {
   const [i, stem] = [plot.i, plot.stem].map(String);
   return `Growing ${plot.state} at ${i} (from ${stem}).`;
 }
@@ -92,7 +69,7 @@ export function iterate(field: Plot[]): [Plot[], string[]] {
       child.stem = nextPlot.i;
       child.age = 1;
       nextField[child.i] = child;
-      logMessages.push(growMessage(nextField[child.i]));
+      logMessages.push(getGrowMessage(nextField[child.i]));
     } else if (
       isCropState(nextPlot.state) &&
       nextPlot.age < maxAge[nextPlot.state]
@@ -153,7 +130,7 @@ export function addPlot(field: Plot[], i: number, state: StateString) {
 
 export function togglePlot(plot: Plot, field: Plot[]): [Plot[], string[]] {
   let nextField = copyField(field);
-  let logMessages = [];
+  const logMessages = [];
   if (plot.state == PlotState.Water) {
     logMessages.push("Can't plant over the sprinkler.");
   } else if (plot.state == PlotState.Empty) {

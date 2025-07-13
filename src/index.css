@@ -33,6 +33,24 @@ div .sidebar {
   padding: 0.5em 1em;
 }
 
+div .buttonBar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+div .log {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+div .logLine {
+  display: flex;
+  justify-content: left;
+}
+
+
 div .fieldContainer {
   display: flex;
   flex-direction: column;
@@ -109,16 +127,6 @@ div .stemRight {
   width: 100px;
 }
 
-div .log {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-div .logLine {
-  display: flex;
-  justify-content: left;
-}
-
 a {
   font-weight: 500;
   color: #646cff;
@@ -135,7 +143,7 @@ button {
   border-radius: 8px;
   border: 2px solid transparent;
   padding: 0.6em 1.2em;
-  margin: 1em 1em 0;
+  margin: 0.5em 0.5em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;

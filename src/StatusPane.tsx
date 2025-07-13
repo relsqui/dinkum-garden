@@ -1,7 +1,7 @@
 import type { MouseEvent, MouseEventHandler } from "react";
 import { PlotState, type StateString } from "./plot";
 
-export type statusPaneProps = {
+export interface statusPaneProps {
   harvest: number;
   handleIterate: MouseEventHandler<HTMLButtonElement>;
   handleIterateUntilGrown: MouseEventHandler<HTMLButtonElement>;
@@ -15,24 +15,19 @@ export function StatusPane({
   handleClear,
 }: statusPaneProps) {
   return (
-    <div className="sidebar">
+    <div className="sidebar buttonBar">
       <div>Harvest: {harvest}</div>
-      <div className="buttonBar">
-        <div>
-          <button onClick={handleIterate}>Iterate</button>
-          <button onClick={handleIterateUntilGrown}>Until fully grown</button>
-        </div>
-        {[PlotState.Pumpkin, PlotState.Sprout].map((state) => (
-          <button
-            onClick={(e) => {
-              handleClear(e, state);
-            }}
-            key={state}
-          >
-            Clear {state}
-          </button>
-        ))}
-        <button onClick={handleClear}>Clear log</button>
+      <button onClick={handleIterate}>Iterate</button>
+      <button onClick={handleIterateUntilGrown}>Until fully grown</button>
+      <div>
+        <button
+          onClick={(e) => {
+            handleClear(e, PlotState.Pumpkin);
+          }}
+        >
+          Clear {PlotState.Pumpkin}
+        </button>
+        <button onClick={handleClear}>Reset</button>
       </div>
     </div>
   );
