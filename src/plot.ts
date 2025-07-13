@@ -108,7 +108,7 @@ export function getInfo(plot: Plot, field: Plot[], settings: Settings) {
   if (settings.debug) {
     info.push(
       ...[
-        `${plot.i} (${plot.x},${plot.y})`,
+        `${String(plot.i)} (${String(plot.x)},${String(plot.y)})`,
         String(getEmptyNeighbors(plot, field, settings)),
         plot.stem,
       ].map(String)

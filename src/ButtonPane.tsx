@@ -55,7 +55,7 @@ export function ButtonPane({
     <div className="sidebar buttonPane">
       <div className="stats">
         <div>Day: {day}</div>
-        <div>Harvests: {harvests}</div>
+        <div>Harvests: {harvests} {PlotState.Pumpkin}</div>
       </div>
       <div>
         <div>
@@ -92,7 +92,7 @@ export function ButtonPane({
       <div>
         <button
           onClick={(e) => {
-            setIterationDays(1);
+            // setIterationDays(1);
             handleReset(e);
           }}
         >
