@@ -17,7 +17,7 @@
 
 :root {
   color: rgb(215, 201, 201);
-  background-color: rgb(29, 86, 29);
+  background-color: rgb(39, 86, 29);
   --stem-color: #70ce60;
 }
 
@@ -75,7 +75,7 @@ div .plot {
 }
 
 div .plotInfo {
-  color: rgb(165, 161, 250);
+  color: rgb(229, 228, 228);
   font-size: small;
   position: absolute;
   top: 5px;
@@ -83,7 +83,7 @@ div .plotInfo {
 }
 
 div .plotAge {
-  color: rgb(229, 228, 228);
+  color: rgb(94, 179, 77);
   font-size: small;
   position: absolute;
   top: 5px;

@@ -4,13 +4,7 @@ import { Log } from "./Log";
 import { ButtonPane } from "./ButtonPane";
 import { appendLog, type LogLine } from "./log";
 import { getEmptyField, harvestAll, iterate, togglePlot } from "./field";
-import {
-  canHarvest,
-  copyPlot,
-  getEmptyPlot,
-  PlotState,
-  type Plot,
-} from "./plot";
+import { canHarvest, getEmptyPlot, PlotState, type Plot } from "./plot";
 
 function App() {
   const [field, setField] = useState(getEmptyField);
@@ -62,14 +56,18 @@ function App() {
     // resetting again removes those sprouts.
     let doubleReset = true;
     const nextField = field.map((plot) => {
+      const nextPlot = getEmptyPlot(plot.x, plot.y);
       if ([PlotState.Pumpkin, PlotState.Melon].includes(plot.state)) {
         doubleReset = false;
-        return getEmptyPlot(plot.x, plot.y);
-      }
-      const nextPlot = copyPlot(plot);
-      if (plot.state == PlotState.Sprout && plot.age > 1) {
-        doubleReset = false;
-        nextPlot.age = 1;
+        nextPlot.state = PlotState.Empty;
+      } else {
+        if (plot.state == PlotState.Sprout) {
+          if (plot.age > 1) {
+            doubleReset = false;
+          }
+          nextPlot.age = 1;
+        }
+        nextPlot.state = plot.state;
       }
       return nextPlot;
     });

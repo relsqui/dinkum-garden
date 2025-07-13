@@ -92,9 +92,9 @@ stemClasses[-1] = "stem stemRight";
 stemClasses[1] = "stem stemLeft";
 
 export function getInfo(plot: Plot, debug: boolean) {
-  const info: (string | number)[] = [plot.i];
+  const info: (string | number)[] = [];
   if (debug && import.meta.env.MODE != "production") {
-    info.push(plot.children.length);
+    info.push(plot.i, plot.children.length);
   }
   return info.map(String).join(" / ");
 }
