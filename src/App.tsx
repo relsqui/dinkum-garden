@@ -5,8 +5,10 @@ import { getEmptyField, harvestAll, iterate, togglePlot } from "./field";
 import { canHarvest, getEmptyPlot, PlotState, type Plot } from "./plot";
 import { Log } from "./Log";
 import { appendLog, type LogLine } from "./log";
+import { defaultSettings, type SettingName } from "./settings";
 
 function App() {
+  const [settings, setSettings] = useState(defaultSettings);
   const [field, setField] = useState(getEmptyField);
   const [harvests, setHarvests] = useState(0);
   const [day, setDay] = useState(1);
@@ -16,6 +18,11 @@ function App() {
     // The setter needs to be a function so it handles multiple
     // messages in one render properly.
     setLogContents((prevLogContents) => appendLog(message, prevLogContents));
+  }
+
+  // TODO: sometimes these will not be boolean lol
+  function updateSetting(setting: SettingName, value: boolean) {
+    setSettings({ ...settings, [setting]: value });
   }
 
   function handleIterate(e: React.MouseEvent, iterationDays = 1) {
@@ -28,7 +35,9 @@ function App() {
     let d = 1;
     for (; d <= iterationDays; d++) {
       [nextField, newGrowth] = iterate(nextField);
-      [nextField, newHarvests] = harvestAll(nextField);
+      if (settings.autoHarvest) {
+        [nextField, newHarvests] = harvestAll(nextField);
+      }
       const logParts = [];
       if (newGrowth) logParts.push(`grew ${String(newGrowth)}`);
       if (newHarvests) {
@@ -98,7 +107,9 @@ function App() {
     <>
       <ButtonPane
         {...{
-          day: day,
+          settings,
+          updateSetting,
+          day,
           harvests,
           handleIterate,
           handleReset,

@@ -37,7 +37,18 @@ div .buttonBar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+}
+
+div .stats {
+  display: flex;
+  flex-direction: column;
+}
+
+div .autoHarvest {
+  display: flex;
+  align-items: center;
+  justify-content: baseline;
 }
 
 div .log {
@@ -49,7 +60,6 @@ div .logLine {
   display: flex;
   justify-content: left;
 }
-
 
 div .fieldContainer {
   display: flex;
@@ -65,7 +75,7 @@ div .field {
 }
 
 div .plot {
-  background-color: #4e3314;
+  background-color: #4e2814;
   aspect-ratio: 1;
   min-width: 100px;
   display: flex;
@@ -156,7 +166,10 @@ button:focus-visible {
 }
 
 input {
-  height: 2.5em;
   font: inherit;
   margin: 0.5em;
+}
+
+input[type=text] {
+  height: 2.5em;
 }
