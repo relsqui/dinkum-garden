@@ -207,6 +207,6 @@ input {
   margin: 0.5em;
 }
 
-input[type=number] {
+input[type="number"] {
   height: 2.5em;
 }

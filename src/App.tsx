@@ -5,7 +5,7 @@ import { getEmptyField, harvestAll, iterate, togglePlot } from "./field";
 import { canHarvest, getEmptyPlot, PlotState, type Plot } from "./plot";
 import { Log } from "./Log";
 import { appendLog, type LogLine } from "./log";
-import { defaultSettings, type SettingName } from "./settings";
+import { defaultSettings, type SettingKey, type Settings } from "./settings";
 
 function App() {
   const [settings, setSettings] = useState(defaultSettings);
@@ -20,8 +20,8 @@ function App() {
     setLogContents((prevLogContents) => appendLog(message, prevLogContents));
   }
 
-  // TODO: sometimes these will not be boolean lol
-  function updateSetting(setting: SettingName, value: boolean) {
+  // Shoutout to https://typeofnan.dev/how-to-make-one-function-argument-dependent-on-another-in-typescript/
+  function updateSetting<K extends SettingKey>(setting: K, value: Settings[K]) {
     setSettings({ ...settings, [setting]: value });
   }
 

@@ -1,6 +1,6 @@
 import { useState, type MouseEvent } from "react";
 import { PlotState, type StateString } from "./plot";
-import type { SettingName, Settings } from "./settings";
+import type { SettingKey, Settings, SettingWithType } from "./settings";
 
 function SettingCheckbox({
   label,
@@ -8,10 +8,10 @@ function SettingCheckbox({
   settings,
   updateSetting,
 }: {
-  label: SettingName;
+  label: SettingWithType<boolean>;
   description: string;
   settings: Settings;
-  updateSetting: (setting: SettingName, value: boolean) => void;
+  updateSetting: (setting: SettingKey, value: boolean) => void;
 }) {
   return (
     <>
@@ -39,14 +39,14 @@ export function ButtonPane({
   handleReset,
 }: {
   settings: Settings;
-  updateSetting: (setting: SettingName, value: boolean) => void;
+  updateSetting: (setting: SettingKey, value: boolean) => void;
   day: number;
   harvests: number;
   handleIterate: (event: MouseEvent, days?: number) => void;
   handleReset: (event: MouseEvent, state?: StateString) => void;
 }) {
   const [iterationDays, setIterationDays] = useState(1);
-  const checkboxes: [SettingName, string][] = [
+  const checkboxes: [SettingWithType<boolean>, string][] = [
     ["autoHarvest", `Harvest full-grown ${PlotState.Pumpkin}`],
     ["wrapWE", "Wrap field left-to-right"],
     ["wrapNS", "Wrap field up-to-down"],

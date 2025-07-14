@@ -1,15 +1,13 @@
-export interface Settings {
-  autoHarvest: boolean;
-  wrapWE: boolean;
-  wrapNS: boolean;
-  debug: boolean;
-}
-
-export const defaultSettings: Settings = {
+export const defaultSettings = {
+  debug: false,
+  iterationDays: 1,
   autoHarvest: false,
   wrapWE: false,
   wrapNS: false,
-  debug: false,
 };
 
-export type SettingName = keyof Settings;
+export type Settings = typeof defaultSettings;
+export type SettingKey = keyof Settings;
+export type SettingWithType<T> = {
+  [K in SettingKey]: Settings[K] extends T ? K : never;
+}[SettingKey];
