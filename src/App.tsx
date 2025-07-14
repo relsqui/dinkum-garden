@@ -14,6 +14,8 @@ function App() {
   const [day, setDay] = useState(1);
   const [logContents, setLogContents] = useState<LogLine[]>([]);
 
+  const queryParams = new URLSearchParams(window.location.search);
+
   function log(message: string) {
     // The setter needs to be a function so it handles multiple
     // messages in one render properly.
@@ -105,18 +107,23 @@ function App() {
 
   return (
     <>
-      <ButtonPane
-        {...{
-          settings,
-          updateSetting,
-          day,
-          harvests,
-          handleIterate,
-          handleReset,
-        }}
-      />
-      <Field {...{ field, settings, handlePlotClick }} />
-      <Log logContents={logContents} />
+      <div id="app">
+        <ButtonPane
+          {...{
+            settings,
+            updateSetting,
+            day,
+            harvests,
+            handleIterate,
+            handleReset,
+          }}
+        />
+        <Field {...{ field, settings, handlePlotClick }} />
+        <Log logContents={logContents} />
+      </div>
+      <div className="debug">
+        {Array(...queryParams.entries()).map(([k, v]) => `${k}=${v}<br />`)}
+      </div>
     </>
   );
 }

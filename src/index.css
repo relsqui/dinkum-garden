@@ -9,16 +9,26 @@
   -moz-osx-font-smoothing: grayscale;
 
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding: 2rem;
-  text-align: center;
+  flex-direction: column;
 }
 
 :root {
   color: rgb(215, 201, 201);
   background-color: rgb(39, 86, 29);
   --stem-color: #70ce60;
+}
+
+div #app {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+div .debug {
+  align-self: center;
+  width: 70%;
 }
 
 div .sidebar {
