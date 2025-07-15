@@ -86,6 +86,7 @@ function App() {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (doubleReset) {
       setField(getEmptyField);
+      setSettings(defaultSettings);
     } else {
       setField(nextField);
     }
