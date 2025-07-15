@@ -1,6 +1,6 @@
-import { type MouseEvent } from "react";
-import { PlotState, type StateString } from "./plot";
-import type { SettingKey, Settings, SettingWithType } from "./settings";
+import type { MouseEvent } from "react";
+import { PlotState, type StateString } from "../lib/plot";
+import type { SettingKey, Settings, SettingWithType } from "../lib/settings";
 
 function SettingCheckbox({
   label,
@@ -19,7 +19,7 @@ function SettingCheckbox({
         type="checkbox"
         name={label}
         id={label}
-        defaultChecked={settings[label]}
+        checked={settings[label]}
         value={String(settings[label])}
         onChange={(e) => {
           updateSetting(label, e.target.checked);

@@ -14,11 +14,9 @@ import type { Settings } from "./settings";
 
 export function getEmptyField() {
   const field: Plot[] = [];
-  let i = 0;
   for (let y = 0; y < 5; y++) {
     for (let x = 0; x < 5; x++) {
       field.push(getEmptyPlot(x, y));
-      i = i + 1;
     }
   }
   field[12].state = "💧";
@@ -115,7 +113,7 @@ export function togglePlot(plot: Plot, field: Plot[]): [Plot[], string[]] {
 
 export function harvestAll(field: Plot[]): [Plot[], number] {
   let harvests = 0;
-  let nextField = field;
+  let nextField = copyField(field);
   for (const plot of nextField) {
     if (canHarvest(plot)) {
       nextField = removePlot(nextField, plot.i);
