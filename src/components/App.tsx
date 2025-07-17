@@ -82,7 +82,7 @@ function App() {
       }
       return nextPlot;
     });
-    // Uhhh eslint you're just wrong about this one.
+    // Uhhh typescript-eslint you're just wrong about this one.
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (doubleReset) {
       setField(getEmptyField);
