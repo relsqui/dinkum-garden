@@ -10,7 +10,12 @@ import {
   canGrow,
   getEmptyNeighbors,
 } from "./plot";
-import type { Settings } from "./settings";
+import {
+  defaultSettings,
+  type SaveableKey,
+  type SaveableSettings,
+  type Settings,
+} from "./settings";
 
 export function getEmptyField() {
   const field: Plot[] = [];
@@ -27,7 +32,31 @@ export function copyField(field: Plot[]) {
   return field.map((plot) => copyPlot(plot));
 }
 
-function getGrowDestination(field: Plot[], i: number, settings: Settings): number | null {
+export function getSproutIndices(field: Plot[]) {
+  return field.filter((p) => p.state == PlotState.Sprout).map((p) => p.i);
+}
+
+export function saveToQueryString(field: Plot[], settings: Settings) {
+  const sprouts = getSproutIndices(field).map(String).join(".");
+  const settingsToSave = Object.fromEntries(
+    Object.entries(settings as SaveableSettings)
+      .filter(
+        <K extends SaveableKey>([k, v]: [string, SaveableSettings[K]]) =>
+          v !== defaultSettings[k as SaveableKey]
+      )
+      .map(([k, v]) => [k, String(v)])
+  );
+  return new URLSearchParams({
+    sprouts,
+    ...settingsToSave,
+  }).toString();
+}
+
+function getGrowDestination(
+  field: Plot[],
+  i: number,
+  settings: Settings
+): number | null {
   const plot = field[i];
   if (plot.state != PlotState.Sprout) return null;
   if (plot.age < maxAge[plot.state]) return null;
@@ -102,9 +131,7 @@ export function togglePlot(plot: Plot, field: Plot[]): [Plot[], string[]] {
     } else if (canHarvest(plot)) {
       logMessages.push(`Harvesting ${plot.state}.`);
     } else {
-      logMessages.push(
-        `Removing partly-grown ${plot.state}.`
-      );
+      logMessages.push(`Removing partly-grown ${plot.state}.`);
     }
     nextField = removePlot(field, plot.i);
   }

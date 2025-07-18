@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ButtonPane } from "./ButtonPane";
 import { Field } from "./Field";
-import { getEmptyField, harvestAll, iterate, togglePlot } from "../lib/field";
+import { getEmptyField, harvestAll, iterate, saveToQueryString, togglePlot } from "../lib/field";
 import { canHarvest, getEmptyPlot, PlotState, type Plot } from "../lib/plot";
 import { Log } from "./Log";
 import { appendLog, type LogLine } from "../lib/log";
@@ -18,7 +18,7 @@ function App() {
   const [day, setDay] = useState(1);
   const [logContents, setLogContents] = useState<LogLine[]>([]);
 
-  const queryParams = new URLSearchParams(window.location.search);
+  // const queryParams = new URLSearchParams(window.location.search);
 
   function log(message: string) {
     // The setter needs to be a function so it handles multiple
@@ -125,11 +125,7 @@ function App() {
         <Log logContents={logContents} />
       </div>
       <div className="debug">
-        {Array(...queryParams.entries()).map(([k, v]) => (
-          <p>
-            {k}={v}
-          </p>
-        ))}
+        <p>{saveToQueryString(field, settings)}</p>
       </div>
     </>
   );
