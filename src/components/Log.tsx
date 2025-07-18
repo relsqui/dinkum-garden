@@ -1,4 +1,4 @@
-import type { LogLine } from "./log";
+import type { LogLine } from "../lib/log";
 
 export function Log({ logContents }: { logContents: LogLine[] }) {
   return (

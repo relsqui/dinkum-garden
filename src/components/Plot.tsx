@@ -1,5 +1,5 @@
-import { Emoji, getInfo, maxAge, stemClasses, stemFragment, type Plot } from "./plot";
-import type { Settings } from "./settings";
+import { Emoji, getInfo, maxAge, stemClasses, stemFragment, type Plot } from "../lib/plot";
+import type { Settings } from "../lib/settings";
 
 export function FieldPlot({
   onClick,

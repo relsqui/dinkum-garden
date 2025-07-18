@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { ButtonPane } from "./ButtonPane";
 import { Field } from "./Field";
-import { getEmptyField, harvestAll, iterate, togglePlot } from "./field";
-import { canHarvest, getEmptyPlot, PlotState, type Plot } from "./plot";
+import { getEmptyField, harvestAll, iterate, togglePlot } from "../lib/field";
+import { canHarvest, getEmptyPlot, PlotState, type Plot } from "../lib/plot";
 import { Log } from "./Log";
-import { appendLog, type LogLine } from "./log";
-import { defaultSettings, type SettingKey, type Settings } from "./settings";
+import { appendLog, type LogLine } from "../lib/log";
+import {
+  defaultSettings,
+  type SettingKey,
+  type Settings,
+} from "../lib/settings";
 
 function App() {
   const [settings, setSettings] = useState(defaultSettings);
@@ -54,7 +58,7 @@ function App() {
         );
       }
     }
-    logMessages.map(log);
+    logMessages.forEach(log);
     setField(nextField);
     setHarvests(nextHarvests);
     setDay(day + iterationDays);
@@ -84,10 +88,11 @@ function App() {
       }
       return nextPlot;
     });
-    // Uhhh eslint you're just wrong about this one.
+    // Uhhh typescript-eslint you're just wrong about this one.
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (doubleReset) {
       setField(getEmptyField);
+      setSettings(defaultSettings);
     } else {
       setField(nextField);
     }
@@ -99,7 +104,7 @@ function App() {
     if (canHarvest(plot)) {
       setHarvests(harvests + 1);
     }
-    logMessages.map((message) => {
+    logMessages.forEach((message) => {
       log(`Day ${String(day)}: ${message}`);
     });
     setField(nextField);
@@ -109,20 +114,22 @@ function App() {
     <>
       <div id="app">
         <ButtonPane
-          {...{
-            settings,
-            updateSetting,
-            day,
-            harvests,
-            handleIterate,
-            handleReset,
-          }}
+          settings={settings}
+          updateSetting={updateSetting}
+          day={day}
+          harvests={harvests}
+          handleIterate={handleIterate}
+          handleReset={handleReset}
         />
         <Field {...{ field, settings, handlePlotClick }} />
         <Log logContents={logContents} />
       </div>
       <div className="debug">
-        {Array(...queryParams.entries()).map(([k, v]) => `${k}=${v}<br />`)}
+        {Array(...queryParams.entries()).map(([k, v]) => (
+          <p>
+            {k}={v}
+          </p>
+        ))}
       </div>
     </>
   );
