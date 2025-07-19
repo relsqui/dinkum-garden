@@ -10,12 +10,7 @@ import {
   canGrow,
   getEmptyNeighbors,
 } from "./plot";
-import {
-  defaultSettings,
-  type SaveableKey,
-  type SaveableSettings,
-  type Settings,
-} from "./settings";
+import { type Settings } from "./settings";
 
 export function getEmptyField() {
   const field: Plot[] = [];
@@ -36,20 +31,14 @@ export function getSproutIndices(field: Plot[]) {
   return field.filter((p) => p.state == PlotState.Sprout).map((p) => p.i);
 }
 
-export function saveToQueryString(field: Plot[], settings: Settings) {
-  const sprouts = getSproutIndices(field).map(String).join(".");
-  const settingsToSave = Object.fromEntries(
-    Object.entries(settings as SaveableSettings)
-      .filter(
-        <K extends SaveableKey>([k, v]: [string, SaveableSettings[K]]) =>
-          v !== defaultSettings[k as SaveableKey]
-      )
-      .map(([k, v]) => [k, String(v)])
-  );
-  return new URLSearchParams({
-    sprouts,
-    ...settingsToSave,
-  }).toString();
+export function fieldFromSearchParams() {
+  let newField = getEmptyField();
+  const sproutParam =
+    new URLSearchParams(window.location.search).get("sprouts") || "";
+  for (const i of sproutParam.split(".").map(Number)) {
+    newField = addPlot(newField, i, PlotState.Sprout);
+  }
+  return newField;
 }
 
 function getGrowDestination(

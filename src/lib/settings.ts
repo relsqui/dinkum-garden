@@ -14,4 +14,11 @@ export type SettingWithType<T> = {
 
 export type SaveableKey = "autoHarvest" | "wrapWE" | "wrapNS";
 
-export type SaveableSettings = Pick<Settings, SaveableKey>
+export type SaveableSettings = Pick<Settings, SaveableKey>;
+
+export function settingsFromSearchParams() {
+  const searchParams = Object.fromEntries(
+    new URLSearchParams(window.location.search).entries()
+  ) as Partial<SaveableSettings>;
+  return { ...defaultSettings, ...searchParams };
+}

@@ -1,24 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonPane } from "./ButtonPane";
 import { Field } from "./Field";
-import { getEmptyField, harvestAll, iterate, saveToQueryString, togglePlot } from "../lib/field";
+import {
+  fieldFromSearchParams,
+  getEmptyField,
+  harvestAll,
+  iterate,
+  togglePlot,
+} from "../lib/field";
 import { canHarvest, getEmptyPlot, PlotState, type Plot } from "../lib/plot";
 import { Log } from "./Log";
 import { appendLog, type LogLine } from "../lib/log";
 import {
   defaultSettings,
+  settingsFromSearchParams,
   type SettingKey,
   type Settings,
 } from "../lib/settings";
+import { stateToSearchParams } from "../lib/app";
 
 function App() {
-  const [settings, setSettings] = useState(defaultSettings);
-  const [field, setField] = useState(getEmptyField);
+  const [settings, setSettings] = useState(settingsFromSearchParams);
+  const [field, setField] = useState(fieldFromSearchParams);
   const [harvests, setHarvests] = useState(0);
   const [day, setDay] = useState(1);
   const [logContents, setLogContents] = useState<LogLine[]>([]);
 
-  // const queryParams = new URLSearchParams(window.location.search);
+  useEffect(() => {
+    const stateParams = stateToSearchParams(field, settings);
+    if (window.location.search != stateParams) {
+      const newLocation =
+        stateParams.length > 0 ? `?${stateParams}` : window.location.pathname;
+      window.history.replaceState(null, "", newLocation);
+    }
+  }, [field, settings]);
 
   function log(message: string) {
     // The setter needs to be a function so it handles multiple
@@ -125,7 +140,7 @@ function App() {
         <Log logContents={logContents} />
       </div>
       <div className="debug">
-        <p>{saveToQueryString(field, settings)}</p>
+        {/* <p>{JSON.stringify(settingsFromSearchParams())}</p> */}
       </div>
     </>
   );
