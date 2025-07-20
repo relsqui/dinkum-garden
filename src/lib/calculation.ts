@@ -8,43 +8,51 @@ interface WeightedResult<T> {
   weight: number;
 }
 
-// should be a primitive so it's easy to compare
-// but naming a type ensures it's not just any old string
-type CacheKey = string;
-
-function getCacheKey(field: Plot[], settings: Settings): CacheKey {
+function getCacheKey(field: Plot[], settings: Settings): string {
   const fieldKey = field
-    // for any given layout we could track only gourds and not sprouts
-    // but including both lets us reuse the cache for different layouts
+    // For any given layout we could track only gourds and not sprouts,
+    // but including both lets us reuse the cache for different layouts.
     .filter((p) => isCropState(p.state))
-    // location, age, and gourd/sprout links affect the iteration options
+    // Location, age, and gourd/sprout links affect the iteration options.
     // (gourd.stem and sprout.children duplicate the same info so we
-    // only need to include one, don't think it matters which)
+    // only need to include one, don't think it matters which.)
     .map((p) => [p.i, p.age, p.stem ?? ""].map(String).join(","))
     .join(":");
   const wrapKey = (settings.wrapNS ? "NS" : "") + (settings.wrapWE ? "WE" : "");
   return `${fieldKey}/${wrapKey}`;
 }
 
-const resultCache: Record<CacheKey, WeightedResult<Plot[]>[]> = {};
-
 function normalizeWeightedResults<T>(
   results: WeightedResult<T>[],
-  hashFn: (r: T) => string = (r) => String(r)
+  hashFn: (r: T) => string = String
 ): WeightedResult<T>[] {
-  const resultsByHash: Record<string, { result: T; weight: number }> = {};
+  const resultsByHash: Record<string, WeightedResult<T>> = {};
   for (const wr of results) {
     const key = hashFn(wr.result);
     if (Object.hasOwn(resultsByHash, key)) {
       resultsByHash[key].weight += wr.weight;
     } else {
-      resultsByHash[key] = {
-        result: wr.result,
-        weight: wr.weight,
-      };
+      resultsByHash[key] = wr;
     }
   }
   return Object.values(resultsByHash);
+}
+
+const nextFieldCache: Record<string, WeightedResult<Plot[]>[]> = {};
+
+function getNextFieldsWithCache(
+  field: Plot[],
+  settings: Settings
+): WeightedResult<Plot[]>[] {
+  const key = getCacheKey(field, settings);
+  if (!Object.hasOwn(nextFieldCache, key)) {
+    // TODO make this work lol, should live in field.ts probs
+    // and call normalizeWeightedResults before returning
+    // (then the current iterate can use it)
+    //   resultCache[key] = weightedIterate(field, settings)
+    nextFieldCache[key] = [];
+  }
+  return nextFieldCache[key];
 }
 
 function getWeightedResults(
@@ -62,21 +70,9 @@ function getWeightedResults(
     ];
   }
   const [clearField, newHarvests] = harvestAll(field);
-  field = clearField;
   harvests += newHarvests;
-  const key = getCacheKey(field, settings);
-  let weightedNextFields: WeightedResult<Plot[]>[];
-  if (Object.hasOwn(resultCache, key)) {
-    weightedNextFields = resultCache[key];
-  } else {
-    // TODO make this work lol, should live in field.ts probs
-    // and call normalizeWeightedResults before returning
-    // (then the current iterate can use it)
-    weightedNextFields = []; // weightedIterate(field, settings);
-    resultCache[key] = weightedNextFields;
-  }
   const results = [];
-  for (const nextField of weightedNextFields) {
+  for (const nextField of getNextFieldsWithCache(clearField, settings)) {
     results.push(
       ...getWeightedResults(
         nextField.result,
@@ -93,14 +89,16 @@ function getWeightedResults(
   return normalizeWeightedResults(results);
 }
 
+function sum(numbers: number[]) {
+  return numbers.reduce((acc, curr) => acc + curr, 0);
+}
+
 export function getWeightedProfit(field: Plot[], settings: Settings) {
   const weightedResults = getWeightedResults(field, settings);
-  const totalWeight = weightedResults
-    .map((wr) => wr.weight)
-    .reduce((acc, curr) => acc + curr, 0);
-  const totalHarvests = weightedResults
-    .map((wr) => (wr.result * wr.weight) / totalWeight)
-    .reduce((acc, curr) => acc + curr, 0);
+  const totalWeight = sum(weightedResults.map((wr) => wr.weight));
+  const weightedHarvests = sum(
+    weightedResults.map((wr) => (wr.result * wr.weight) / totalWeight)
+  );
   const sproutCount = getSproutIndices(field).length;
-  return getFieldProfit(totalHarvests, sproutCount);
+  return getFieldProfit(weightedHarvests, sproutCount);
 }
