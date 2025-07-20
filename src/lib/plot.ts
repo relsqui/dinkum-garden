@@ -25,6 +25,11 @@ export const maxAge = {
   [Emoji.Melon]: 7,
 };
 
+export const seedPrice = {
+  [PlotState.Pumpkin]: 780,
+  [PlotState.Melon]: 770,
+};
+
 export interface Plot {
   x: number;
   y: number;

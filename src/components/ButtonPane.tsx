@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { PlotState, type StateString } from "../lib/plot";
+import { PlotState, seedPrice, type StateString } from "../lib/plot";
 import type { SettingKey, Settings, SettingWithType } from "../lib/settings";
 
 function SettingCheckbox({
@@ -35,6 +35,7 @@ export function ButtonPane({
   updateSetting,
   day,
   harvests,
+  sproutCount,
   handleIterate,
   handleReset,
 }: {
@@ -42,6 +43,7 @@ export function ButtonPane({
   updateSetting: <K extends SettingKey>(setting: K, value: Settings[K]) => void;
   day: number;
   harvests: number;
+  sproutCount: number;
   handleIterate: (event: MouseEvent, days?: number) => void;
   handleReset: (event: MouseEvent, state?: StateString) => void;
 }) {
@@ -50,11 +52,19 @@ export function ButtonPane({
     ["wrapWE", "Wrap field left-to-right"],
     ["wrapNS", "Wrap field up-to-down"],
   ];
+  // The base prices of both gourds are 4x the seed prices.
+  const profit = (4 * harvests - sproutCount) * seedPrice[PlotState.Pumpkin];
   return (
     <div className="sidebar buttonPane">
       <div className="stats">
         <div>Day: {day}</div>
-        <div>Harvests: {harvests} {PlotState.Pumpkin}</div>
+        <div>
+          Harvests: {harvests} {PlotState.Pumpkin}
+        </div>
+        <div>Sprouts: {sproutCount}</div>
+        <div>
+          <b>Profit: {profit.toLocaleString()}</b>
+        </div>
       </div>
       <div>
         <div>

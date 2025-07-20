@@ -4,6 +4,7 @@ import { Field } from "./Field";
 import {
   fieldFromSearchParams,
   getEmptyField,
+  getSproutIndices,
   harvestAll,
   iterate,
   togglePlot,
@@ -133,6 +134,7 @@ function App() {
           updateSetting={updateSetting}
           day={day}
           harvests={harvests}
+          sproutCount={getSproutIndices(field).length}
           handleIterate={handleIterate}
           handleReset={handleReset}
         />
@@ -140,8 +142,6 @@ function App() {
         <Log logContents={logContents} />
       </div>
       <div className="debug">
-        {/* <p>{JSON.stringify(stateToSearchParams(field, settings))}</p>
-        <p>{window.location.search}</p> */}
       </div>
     </>
   );
