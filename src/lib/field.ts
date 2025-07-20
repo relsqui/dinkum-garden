@@ -33,10 +33,13 @@ export function getSproutIndices(field: Plot[]) {
 
 export function fieldFromSearchParams() {
   let newField = getEmptyField();
-  const sproutParam =
-    new URLSearchParams(window.location.search).get("sprouts") ?? "";
-  for (const i of sproutParam.split(".").map(Number)) {
-    newField = addPlot(newField, i, PlotState.Sprout);
+  const sproutParam = new URLSearchParams(window.location.search).get(
+    "sprouts"
+  );
+  if (sproutParam !== null) {
+    for (const i of sproutParam.split(".").map(Number)) {
+      newField = addPlot(newField, i, PlotState.Sprout);
+    }
   }
   return newField;
 }
