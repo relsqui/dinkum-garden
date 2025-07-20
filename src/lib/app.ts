@@ -2,19 +2,20 @@ import { getSproutIndices } from "./field";
 import type { Plot } from "./plot";
 import {
   type Settings,
-  type SaveableSettings,
-  type SaveableKey,
   defaultSettings,
+  saveableKeys,
+  type SaveableKey,
 } from "./settings";
 
 export function stateToSearchParams(field: Plot[], settings: Settings) {
   const sprouts = getSproutIndices(field).map(String).join(".");
-  const sproutSetting: { sprouts: string } | {} =
+  const sproutSetting: { sprouts?: string } =
     sprouts.length > 0 ? { sprouts } : {};
   const settingsToSave = Object.fromEntries(
-    Object.entries(settings as SaveableSettings)
+    Object.entries(settings)
       .filter(
-        <K extends SaveableKey>([k, v]: [string, SaveableSettings[K]]) =>
+        ([k, v]) =>
+          saveableKeys.includes(k as SaveableKey) &&
           v !== defaultSettings[k as SaveableKey]
       )
       .map(([k, v]) => [k, String(v)])

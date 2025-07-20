@@ -140,7 +140,8 @@ function App() {
         <Log logContents={logContents} />
       </div>
       <div className="debug">
-        {/* <p>{JSON.stringify(settingsFromSearchParams())}</p> */}
+        {/* <p>{JSON.stringify(stateToSearchParams(field, settings))}</p>
+        <p>{window.location.search}</p> */}
       </div>
     </>
   );
