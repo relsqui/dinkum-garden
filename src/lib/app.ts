@@ -1,11 +1,16 @@
 import { getSproutIndices } from "./field";
-import type { Plot } from "./plot";
+import { PlotState, seedPrice, type Plot } from "./plot";
 import {
   type Settings,
   defaultSettings,
   saveableKeys,
   type SaveableKey,
 } from "./settings";
+
+export function getFieldProfit (harvests: number, sproutCount: number) {
+  return (4 * harvests - sproutCount) * seedPrice[PlotState.Pumpkin];
+
+}
 
 export function stateToSearchParams(field: Plot[], settings: Settings) {
   const sprouts = getSproutIndices(field).map(String).join(".");

@@ -1,6 +1,7 @@
 import type { MouseEvent } from "react";
-import { PlotState, seedPrice, type StateString } from "../lib/plot";
+import { PlotState, type StateString } from "../lib/plot";
 import type { SettingKey, Settings, SettingWithType } from "../lib/settings";
+import { getFieldProfit } from "../lib/app";
 
 function SettingCheckbox({
   label,
@@ -53,7 +54,6 @@ export function ButtonPane({
     ["wrapNS", "Wrap field up-to-down"],
   ];
   // The base prices of both gourds are 4x the seed prices.
-  const profit = (4 * harvests - sproutCount) * seedPrice[PlotState.Pumpkin];
   return (
     <div className="sidebar buttonPane">
       <div className="stats">
@@ -63,7 +63,9 @@ export function ButtonPane({
         </div>
         <div>Sprouts: {sproutCount}</div>
         <div>
-          <b>Profit: {profit.toLocaleString()}</b>
+          <b>
+            Profit: {getFieldProfit(harvests, sproutCount).toLocaleString()}
+          </b>
         </div>
       </div>
       <div>
