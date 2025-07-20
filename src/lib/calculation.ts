@@ -9,13 +9,11 @@ interface WeightedResult<T> {
 }
 
 function getCacheKey(field: Plot[], settings: Settings): string {
+  // For any given layout we could track only gourds and not sprouts,
+  // but including both lets us reuse the cache for different layouts.
+  // Location, age, and gourd/sprout links affect the iteration options.
   const fieldKey = field
-    // For any given layout we could track only gourds and not sprouts,
-    // but including both lets us reuse the cache for different layouts.
     .filter((p) => isCropState(p.state))
-    // Location, age, and gourd/sprout links affect the iteration options.
-    // (gourd.stem and sprout.children duplicate the same info so we
-    // only need to include one, don't think it matters which.)
     .map((p) => [p.i, p.age, p.stem ?? ""].map(String).join(","))
     .join(":");
   const wrapKey = (settings.wrapNS ? "NS" : "") + (settings.wrapWE ? "WE" : "");
@@ -26,6 +24,8 @@ function normalizeWeightedResults<T>(
   results: WeightedResult<T>[],
   hashFn: (r: T) => string = String
 ): WeightedResult<T>[] {
+  // Takes a list of weighted results and deduplicates them by a
+  // string hash of the result, adding the weights together.
   const resultsByHash: Record<string, WeightedResult<T>> = {};
   for (const wr of results) {
     const key = hashFn(wr.result);
@@ -55,13 +55,14 @@ function getNextFieldsWithCache(
   return nextFieldCache[key];
 }
 
-function getWeightedResults(
+function getWeightedHarvests(
   field: Plot[],
   settings: Settings,
   harvests = 0
 ): WeightedResult<number>[] {
+  const [clearField, newHarvests] = harvestAll(field);
+  harvests += newHarvests;
   if (settings.iterationDays == 0) {
-    // Recursion base case.
     return [
       {
         result: harvests,
@@ -69,12 +70,10 @@ function getWeightedResults(
       },
     ];
   }
-  const [clearField, newHarvests] = harvestAll(field);
-  harvests += newHarvests;
   const results = [];
   for (const nextField of getNextFieldsWithCache(clearField, settings)) {
     results.push(
-      ...getWeightedResults(
+      ...getWeightedHarvests(
         nextField.result,
         { ...settings, iterationDays: settings.iterationDays - 1 },
         harvests
@@ -93,12 +92,12 @@ function sum(numbers: number[]) {
   return numbers.reduce((acc, curr) => acc + curr, 0);
 }
 
-export function getWeightedProfit(field: Plot[], settings: Settings) {
-  const weightedResults = getWeightedResults(field, settings);
-  const totalWeight = sum(weightedResults.map((wr) => wr.weight));
-  const weightedHarvests = sum(
-    weightedResults.map((wr) => (wr.result * wr.weight) / totalWeight)
+export function getExpectedProfit(field: Plot[], settings: Settings) {
+  const weightedHarvests = getWeightedHarvests(field, settings);
+  const totalWeight = sum(weightedHarvests.map((wr) => wr.weight));
+  const expectedHarvests = sum(
+    weightedHarvests.map((wr) => (wr.result * wr.weight) / totalWeight)
   );
   const sproutCount = getSproutIndices(field).length;
-  return getFieldProfit(weightedHarvests, sproutCount);
+  return getFieldProfit(expectedHarvests, sproutCount);
 }
