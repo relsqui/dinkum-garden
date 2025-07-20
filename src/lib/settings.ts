@@ -1,7 +1,7 @@
 export const defaultSettings = {
   debug: false,
   iterationDays: 1,
-  autoHarvest: false,
+  autoHarvest: true,
   wrapWE: false,
   wrapNS: false,
 };
