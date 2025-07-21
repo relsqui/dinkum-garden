@@ -112,26 +112,25 @@ export function iterate(
   const possibleFutures: WeightedResult<possibleFuture>[] = [];
   let newGrowth = 0;
   for (const growDestination of growDestinations) {
-    let nextField = copyField(field);
+    const possibleNextField = copyField(nextField);
     if (growDestination.result !== null) {
-      const child = copyPlot(nextField[growDestination.result]);
-      nextField[sprout].children.push(child.i);
+      const child = possibleNextField[growDestination.result];
       child.state = PlotState.Pumpkin;
-      child.stem = nextField[sprout].i;
+      child.stem = sprout;
       child.age = 1;
-      nextField[child.i] = child;
+      possibleNextField[sprout].children.push(child.i);
       newGrowth++;
     }
     if (remainingSprouts.length == 0) {
       possibleFutures.push({
-        result: { nextField, newGrowth },
+        result: { nextField: possibleNextField, newGrowth },
         weight: growDestination.weight,
       });
     } else {
       for (let s = 0; s < remainingSprouts.length; s++) {
         possibleFutures.push(
           ...iterate(
-            nextField,
+            possibleNextField,
             settings,
             remainingSprouts.slice(s),
             returnAll,
