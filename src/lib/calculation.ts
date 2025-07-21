@@ -9,9 +9,11 @@ interface WeightedResult<T> {
 }
 
 function getCacheKey(field: Plot[], settings: Settings): string {
+  // Transform the parts of the game state that affect possible next
+  // states into a string we can use as an object key in the cache.
+  // Those parts are crop locations, crop relations, and gourd ages.
   // For any given layout we could track only gourds and not sprouts,
   // but including both lets us reuse the cache for different layouts.
-  // Location, age, and gourd/sprout links affect the iteration options.
   const fieldKey = field
     .filter((p) => isCropState(p.state))
     .map((p) => [p.i, p.age, p.stem ?? ""].map(String).join(","))
@@ -22,13 +24,14 @@ function getCacheKey(field: Plot[], settings: Settings): string {
 
 function normalizeWeightedResults<T>(
   results: WeightedResult<T>[],
-  hashFn: (r: T) => string = String
+  stringify: (r: T) => string = String
 ): WeightedResult<T>[] {
-  // Takes a list of weighted results and deduplicates them by a
-  // string hash of the result, adding the weights together.
+  // Deduplicate a list of weighted results, adding the weights of like results
+  // together. Takes an optional function to convert complex result types
+  // into strings for comparison.
   const resultsByHash: Record<string, WeightedResult<T>> = {};
   for (const wr of results) {
-    const key = hashFn(wr.result);
+    const key = stringify(wr.result);
     if (Object.hasOwn(resultsByHash, key)) {
       resultsByHash[key].weight += wr.weight;
     } else {
@@ -49,7 +52,7 @@ function getNextFieldsWithCache(
     // TODO make this work lol, should live in field.ts probs
     // and call normalizeWeightedResults before returning
     // (then the current iterate can use it)
-    //   resultCache[key] = weightedIterate(field, settings)
+    //   resultCache[key] = getWeightedNextFields(field, settings)
     nextFieldCache[key] = [];
   }
   return nextFieldCache[key];
@@ -60,6 +63,7 @@ function getWeightedHarvests(
   settings: Settings,
   harvests = 0
 ): WeightedResult<number>[] {
+  // Calculate the expected number of harvests for a given field and settings.
   const [clearField, newHarvests] = harvestAll(field);
   harvests += newHarvests;
   if (settings.iterationDays == 0) {
