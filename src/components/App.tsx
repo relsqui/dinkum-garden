@@ -10,7 +10,6 @@ import {
   togglePlot,
 } from "../lib/field";
 import {
-  canGrow,
   canHarvest,
   getEmptyPlot,
   PlotState,
@@ -62,9 +61,7 @@ function App() {
     let newHarvests;
     let d = 1;
     for (; d <= iterationDays; d++) {
-      const fullGrownSprouts = getSproutIndices(nextField).filter(
-        (i) => !canGrow(nextField[i])
-      );
+      const fullGrownSprouts = getSproutIndices(nextField, true);
       ({ nextField, newGrowth } = iterate(
         nextField,
         settings,

@@ -1,5 +1,5 @@
 import { getFieldProfit } from "./app";
-import { getSproutIndices, harvestAll } from "./field";
+import { getSproutIndices, harvestAll, iterate } from "./field";
 import { isCropState, type Plot } from "./plot";
 import type { Settings } from "./settings";
 
@@ -66,11 +66,16 @@ function getNextFieldsWithCache(
 ): WeightedResult<Plot[]>[] {
   const key = getCacheKey(field, settings);
   if (!Object.hasOwn(nextFieldCache, key)) {
-    // TODO make this work lol, should live in field.ts probs
-    // and call normalizeWeightedResults before returning
-    // (then the current iterate can use it)
-    //   resultCache[key] = getWeightedNextFields(field, settings)
-    nextFieldCache[key] = [];
+    const remainingSprouts = getSproutIndices(field, true);
+    nextFieldCache[key] = iterate(field, settings, remainingSprouts, true).map(
+      (weightedPossibleFuture) => {
+        // Discard possibleFuture.newGrowth, that's only for interactive logging.
+        return {
+          result: weightedPossibleFuture.result.nextField,
+          weight: weightedPossibleFuture.weight,
+        };
+      }
+    );
   }
   return nextFieldCache[key];
 }

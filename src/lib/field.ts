@@ -32,8 +32,12 @@ export function copyField(field: Plot[]) {
   return field.map((plot) => copyPlot(plot));
 }
 
-export function getSproutIndices(field: Plot[]) {
-  return field.filter((p) => p.state == PlotState.Sprout).map((p) => p.i);
+export function getSproutIndices(field: Plot[], onlyFullGrown = false) {
+  let sprouts = field.filter((p) => p.state == PlotState.Sprout).map((p) => p.i);
+  if (onlyFullGrown) {
+    sprouts = sprouts.filter(i => !canGrow(field[i]));
+  }
+  return sprouts;
 }
 
 export function fieldFromSearchParams() {
