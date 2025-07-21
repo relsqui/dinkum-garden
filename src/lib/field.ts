@@ -1,14 +1,19 @@
 import {
+  getCacheKey,
+  normalizeWeightedResults,
+  selectedWeightedResult,
+  type WeightedResult,
+} from "./calculation";
+import {
   PlotState,
   getEmptyPlot,
   copyPlot,
   type Plot,
   type StateString,
   isCropState,
-  maxAge,
   canHarvest,
-  canGrow,
   getEmptyNeighbors,
+  canGrow,
 } from "./plot";
 import { type Settings } from "./settings";
 
@@ -44,41 +49,110 @@ export function fieldFromSearchParams() {
   return newField;
 }
 
-function getGrowDestination(
+function getGrowDestinations(
   field: Plot[],
-  i: number,
-  settings: Settings
-): number | null {
+  settings: Settings,
+  i: number
+): WeightedResult<number | null>[] {
   const plot = field[i];
-  if (plot.state != PlotState.Sprout) return null;
-  if (plot.age < maxAge[plot.state]) return null;
-  const growChance = plot.children.length == 0 ? 1 : 0.1 / plot.children.length;
-  if (Math.random() > growChance) return null;
   const emptyNeighbors = getEmptyNeighbors(plot, field, settings);
-  if (emptyNeighbors.length == 0) return null;
-  return emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
+  const growChance =
+    emptyNeighbors.length == 0
+      ? 0
+      : plot.children.length == 0
+      ? 1
+      : 0.1 / plot.children.length;
+  return [
+    {
+      result: null,
+      weight: 1 - growChance,
+    },
+    ...emptyNeighbors.map((i) => {
+      return {
+        result: i,
+        weight: growChance / emptyNeighbors.length,
+      };
+    }),
+  ];
 }
 
-export function iterate(field: Plot[], settings: Settings): [Plot[], number] {
-  const nextField = copyField(field);
+type possibleFuture = { nextField: Plot[]; newGrowth: number };
+
+export function iterate(
+  field: Plot[],
+  settings: Settings,
+  remainingSprouts: number[],
+  returnAll = false,
+  growFirst = true
+): WeightedResult<possibleFuture>[] {
+  let nextField = copyField(field);
+  if (growFirst) {
+    // TODO: there has to be a better place for this logic
+    // (also it's not working, sprouts grow but pumpkins don't)
+    nextField = nextField.map((plot) =>
+      canGrow(plot) ? { ...plot, age: plot.age + 1 } : copyPlot(plot)
+    );
+  }
+  const sprout = remainingSprouts.shift();
+  if (typeof sprout === "undefined") {
+    return [
+      {
+        result: {
+          nextField,
+          newGrowth: 0,
+        },
+        weight: 1,
+      },
+    ];
+  }
+  let growDestinations = getGrowDestinations(field, settings, sprout);
+  if (!returnAll) {
+    growDestinations = [selectedWeightedResult(growDestinations)];
+  }
+  const possibleFutures: WeightedResult<possibleFuture>[] = [];
   let newGrowth = 0;
-  for (const plot of nextField) {
-    const nextPlot = copyPlot(plot);
-    const growDestination = getGrowDestination(nextField, nextPlot.i, settings);
-    if (growDestination !== null) {
-      const child = copyPlot(nextField[growDestination]);
-      nextPlot.children.push(child.i);
+  for (const growDestination of growDestinations) {
+    let nextField = copyField(field);
+    if (growDestination.result !== null) {
+      const child = copyPlot(nextField[growDestination.result]);
+      nextField[sprout].children.push(child.i);
       child.state = PlotState.Pumpkin;
-      child.stem = nextPlot.i;
+      child.stem = nextField[sprout].i;
       child.age = 1;
       nextField[child.i] = child;
       newGrowth++;
-    } else if (canGrow(nextPlot)) {
-      nextPlot.age++;
     }
-    nextField[nextPlot.i] = nextPlot;
+    if (remainingSprouts.length == 0) {
+      possibleFutures.push({
+        result: { nextField, newGrowth },
+        weight: growDestination.weight,
+      });
+    } else {
+      for (let s = 0; s < remainingSprouts.length; s++) {
+        possibleFutures.push(
+          ...iterate(
+            nextField,
+            settings,
+            remainingSprouts.slice(s),
+            returnAll,
+            false
+          ).map((weightedFuture) => {
+            return {
+              result: {
+                nextField: weightedFuture.result.nextField,
+                newGrowth: weightedFuture.result.newGrowth + newGrowth,
+              },
+              weight: weightedFuture.weight * growDestination.weight,
+            };
+          })
+        );
+      }
+    }
   }
-  return [nextField, newGrowth];
+  return normalizeWeightedResults(
+    possibleFutures,
+    (pf) => getCacheKey(pf.nextField, settings) + `/${pf.newGrowth}`
+  );
 }
 
 export function removePlot(field: Plot[], i: number) {

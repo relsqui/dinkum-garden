@@ -3,12 +3,12 @@ import { getSproutIndices, harvestAll } from "./field";
 import { isCropState, type Plot } from "./plot";
 import type { Settings } from "./settings";
 
-interface WeightedResult<T> {
+export interface WeightedResult<T> {
   result: T;
   weight: number;
 }
 
-function getCacheKey(field: Plot[], settings: Settings): string {
+export function getCacheKey(field: Plot[], settings: Settings): string {
   // Transform the parts of the game state that affect possible next
   // states into a string we can use as an object key in the cache.
   // Those parts are crop locations, crop relations, and gourd ages.
@@ -22,7 +22,7 @@ function getCacheKey(field: Plot[], settings: Settings): string {
   return `${fieldKey}/${wrapKey}`;
 }
 
-function normalizeWeightedResults<T>(
+export function normalizeWeightedResults<T>(
   results: WeightedResult<T>[],
   stringify: (r: T) => string = String
 ): WeightedResult<T>[] {
@@ -39,6 +39,23 @@ function normalizeWeightedResults<T>(
     }
   }
   return Object.values(resultsByHash);
+}
+
+export function selectedWeightedResult<T>(
+  weightedResults: WeightedResult<T>[]
+): WeightedResult<T> {
+  const totalWeight = sum(weightedResults.map((wr) => wr.weight));
+  const selection = Math.random() * totalWeight;
+  weightedResults.sort((a, b) => a.weight - b.weight);
+  let cumulativeWeight = 0;
+  for (const wr of weightedResults) {
+    cumulativeWeight += wr.weight;
+    if (selection < cumulativeWeight) {
+      return wr;
+    }
+  }
+  // We should never get here but it makes typescript feel better.
+  return weightedResults.slice(-1)[0];
 }
 
 const nextFieldCache: Record<string, WeightedResult<Plot[]>[]> = {};

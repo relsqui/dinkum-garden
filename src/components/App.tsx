@@ -9,7 +9,13 @@ import {
   iterate,
   togglePlot,
 } from "../lib/field";
-import { canHarvest, getEmptyPlot, PlotState, type Plot } from "../lib/plot";
+import {
+  canGrow,
+  canHarvest,
+  getEmptyPlot,
+  PlotState,
+  type Plot,
+} from "../lib/plot";
 import { Log } from "./Log";
 import { appendLog, type LogLine } from "../lib/log";
 import {
@@ -56,7 +62,14 @@ function App() {
     let newHarvests;
     let d = 1;
     for (; d <= iterationDays; d++) {
-      [nextField, newGrowth] = iterate(nextField, settings);
+      const fullGrownSprouts = getSproutIndices(nextField).filter(
+        (i) => !canGrow(nextField[i])
+      );
+      ({ nextField, newGrowth } = iterate(
+        nextField,
+        settings,
+        fullGrownSprouts
+      )[0].result);
       if (settings.autoHarvest) {
         [nextField, newHarvests] = harvestAll(nextField);
       }
@@ -141,8 +154,7 @@ function App() {
         <Field {...{ field, settings, handlePlotClick }} />
         <Log logContents={logContents} />
       </div>
-      <div className="debug">
-      </div>
+      <div className="debug"></div>
     </>
   );
 }
