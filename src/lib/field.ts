@@ -1,9 +1,9 @@
+import { fieldToKey } from "./expectedValue";
 import {
-  getCacheKey,
   normalizeWeightedResults,
-  selectedWeightedResult,
+  selectWeightedResult,
   type WeightedResult,
-} from "./calculation";
+} from "./weightedResult";
 import {
   PlotState,
   getEmptyPlot,
@@ -33,9 +33,11 @@ export function copyField(field: Plot[]) {
 }
 
 export function getSproutIndices(field: Plot[], onlyFullGrown = false) {
-  let sprouts = field.filter((p) => p.state == PlotState.Sprout).map((p) => p.i);
+  let sprouts = field
+    .filter((p) => p.state == PlotState.Sprout)
+    .map((p) => p.i);
   if (onlyFullGrown) {
-    sprouts = sprouts.filter(i => !canGrow(field[i]));
+    sprouts = sprouts.filter((i) => !canGrow(field[i]));
   }
   return sprouts;
 }
@@ -80,7 +82,10 @@ function getGrowDestinations(
   ];
 }
 
-type possibleFuture = { nextField: Plot[]; newGrowth: number };
+interface possibleFuture {
+  nextField: Plot[];
+  newGrowth: number;
+}
 
 export function iterate(
   field: Plot[],
@@ -111,7 +116,7 @@ export function iterate(
   }
   let growDestinations = getGrowDestinations(field, settings, sprout);
   if (!returnAll) {
-    growDestinations = [selectedWeightedResult(growDestinations)];
+    growDestinations = [selectWeightedResult(growDestinations)];
   }
   const possibleFutures: WeightedResult<possibleFuture>[] = [];
   let newGrowth = 0;
@@ -152,9 +157,10 @@ export function iterate(
       }
     }
   }
-  return normalizeWeightedResults(
+  return normalizeWeightedResults<possibleFuture>(
     possibleFutures,
-    (pf) => getCacheKey(pf.nextField, settings) + `/${pf.newGrowth}`
+    (pf: possibleFuture) =>
+      [fieldToKey([pf.nextField, settings]), pf.newGrowth].join("/")
   );
 }
 

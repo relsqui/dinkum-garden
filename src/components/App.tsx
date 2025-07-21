@@ -24,7 +24,7 @@ import {
   type Settings,
 } from "../lib/settings";
 import { stateToSearchParams } from "../lib/app";
-import { getExpectedProfit } from "../lib/calculation";
+import { getExpectedProfit } from "../lib/expectedValue";
 
 function App() {
   const [settings, setSettings] = useState(settingsFromSearchParams);
@@ -42,8 +42,8 @@ function App() {
     }
   }, [field, settings]);
 
-  const expectedProfit = getExpectedProfit(field, settings);
-  // const expectedProfit = 0;
+  // const expectedProfit = getExpectedProfit(field, settings);
+  const expectedProfit = 0;
 
   function log(message: string) {
     // The setter needs to be a function so it handles multiple

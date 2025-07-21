@@ -65,13 +65,14 @@ export function ButtonPane({
         </div>
         <div>Sprouts: {sproutCount}</div>
         <div>
-          <b>
-            Profit: {getFieldProfit(harvests, sproutCount).toLocaleString()}
-          </b>
+          Profit: {getFieldProfit(harvests, sproutCount).toLocaleString()}
         </div>
       </div>
       <div>
-        Expected profit: {expectedProfit}
+        <b>
+          <p>Expected profit:</p>
+          <p>{expectedProfit.toLocaleString()}</p>
+        </b>
       </div>
       <div>
         <div>
