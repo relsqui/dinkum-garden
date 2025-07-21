@@ -37,6 +37,7 @@ export function ButtonPane({
   day,
   harvests,
   sproutCount,
+  expectedProfit,
   handleIterate,
   handleReset,
 }: {
@@ -45,6 +46,7 @@ export function ButtonPane({
   day: number;
   harvests: number;
   sproutCount: number;
+  expectedProfit: number;
   handleIterate: (event: MouseEvent, days?: number) => void;
   handleReset: (event: MouseEvent, state?: StateString) => void;
 }) {
@@ -67,6 +69,9 @@ export function ButtonPane({
             Profit: {getFieldProfit(harvests, sproutCount).toLocaleString()}
           </b>
         </div>
+      </div>
+      <div>
+        Expected profit: {expectedProfit}
       </div>
       <div>
         <div>

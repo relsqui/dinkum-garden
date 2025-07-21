@@ -24,6 +24,7 @@ import {
   type Settings,
 } from "../lib/settings";
 import { stateToSearchParams } from "../lib/app";
+import { getExpectedProfit } from "../lib/calculation";
 
 function App() {
   const [settings, setSettings] = useState(settingsFromSearchParams);
@@ -40,6 +41,9 @@ function App() {
       window.history.replaceState(null, "", newLocation);
     }
   }, [field, settings]);
+
+  const expectedProfit = getExpectedProfit(field, settings);
+  // const expectedProfit = 0;
 
   function log(message: string) {
     // The setter needs to be a function so it handles multiple
@@ -144,6 +148,7 @@ function App() {
           updateSetting={updateSetting}
           day={day}
           harvests={harvests}
+          expectedProfit={expectedProfit}
           sproutCount={getSproutIndices(field).length}
           handleIterate={handleIterate}
           handleReset={handleReset}

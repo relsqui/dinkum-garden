@@ -1,6 +1,13 @@
 import { getFieldProfit } from "./app";
 import { getSproutIndices, harvestAll, iterate } from "./field";
-import { isCropState, type Plot } from "./plot";
+import {
+  copyPlot,
+  getEmptyPlot,
+  isCropState,
+  maxAge,
+  PlotState,
+  type Plot,
+} from "./plot";
 import type { Settings } from "./settings";
 
 export interface WeightedResult<T> {
@@ -80,6 +87,19 @@ function getNextFieldsWithCache(
   return nextFieldCache[key];
 }
 
+const weightedHarvestCache: Record<string, WeightedResult<number>[]> = {};
+
+function getWeightedHarvestsWithCache(field: Plot[], settings: Settings, harvests = 0) {
+  // Iteration cache keys don't include days because they're only for one
+  // step, but this one needs to because it's for the entire rest of the
+  // simulation, and the duration affects the outcome.
+  const key = getCacheKey(field, settings) + `/${settings.iterationDays}`;
+  if (!Object.hasOwn(weightedHarvestCache, key)) {
+    weightedHarvestCache[key] = getWeightedHarvests(field, settings, harvests);
+  }
+  return weightedHarvestCache[key];
+}
+
 function getWeightedHarvests(
   field: Plot[],
   settings: Settings,
@@ -99,7 +119,7 @@ function getWeightedHarvests(
   const results = [];
   for (const nextField of getNextFieldsWithCache(clearField, settings)) {
     results.push(
-      ...getWeightedHarvests(
+      ...getWeightedHarvestsWithCache(
         nextField.result,
         { ...settings, iterationDays: settings.iterationDays - 1 },
         harvests
@@ -107,7 +127,7 @@ function getWeightedHarvests(
         // If the weighted chance of this next field is n, that's
         // equivalent to putting each of its results into the final
         // results array n times, so multiply the result weight by n.
-        return { ...wr, weight: wr.weight * nextField.weight };
+        return { result: wr.result + harvests, weight: wr.weight * nextField.weight };
       })
     );
   }
@@ -119,10 +139,21 @@ function sum(numbers: number[]) {
 }
 
 export function getExpectedProfit(field: Plot[], settings: Settings) {
-  const weightedHarvests = getWeightedHarvests(field, settings);
+  field = field.map((plot) => {
+    // Skip sprout growth and ignore existing gourds,
+    // calculate for a freshly-grown field.
+    const newPlot = copyPlot(plot);
+    if (plot.state == PlotState.Sprout) {
+      newPlot.age = maxAge[PlotState.Sprout];
+    } else if (plot.state != PlotState.Water) {
+      return getEmptyPlot(plot.x, plot.y);
+    }
+    return newPlot;
+  });
+  const weightedHarvests = getWeightedHarvestsWithCache(field, settings);
   const totalWeight = sum(weightedHarvests.map((wr) => wr.weight));
-  const expectedHarvests = sum(
-    weightedHarvests.map((wr) => (wr.result * wr.weight) / totalWeight)
+  const expectedHarvests = Math.floor(
+    sum(weightedHarvests.map((wr) => (wr.result * wr.weight) / totalWeight))
   );
   const sproutCount = getSproutIndices(field).length;
   return getFieldProfit(expectedHarvests, sproutCount);
